@@ -1,5 +1,5 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function Landing() {
   const router = useRouter();
@@ -47,8 +47,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '600',
-    color: '#1A3164', // Dark blue tone matching the Figma
-    fontFamily: 'System', // Or replace with your custom font
+    color: '#1A3164', 
+    fontFamily: 'System',
     marginBottom: 40,
   },
   button: {
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowOffset: { width: 0, height: 2 },
     shadowRadius: 4,
-    elevation: 4, // for Android shadow
+    elevation: 4,
   },
   buttonText: {
     color: '#FFFFFF',
