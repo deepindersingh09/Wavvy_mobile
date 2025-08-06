@@ -6,7 +6,8 @@ import { supabase } from '../../lib/supabase';
 
 export default function Signup() {
   const router = useRouter();
-  const [name, setName] = useState('');
+  const [firstName, setFirstName] = useState('');
+  const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -15,8 +16,11 @@ export default function Signup() {
     if (password !== confirmPassword) {
       return Alert.alert('Error', 'Passwords do not match');
     }
-    if (!name.trim()) {
-      return Alert.alert('Error', 'Please enter your name');
+    if (!firstName.trim()) {
+      return Alert.alert('Error', 'Please enter your first name');
+    }
+    if (!lastName.trim()) {
+      return Alert.alert('Error', 'Please enter your last name');
     }
 
     const { data, error } = await supabase.auth.signUp({ email, password });
@@ -29,12 +33,12 @@ export default function Signup() {
       const { error: detailsError } = await supabase.from('user_details').insert([
         {
           uuid: user.id,
-          first_name: name,
+          first_name: firstName,
+          last_name: lastName,
           email: email,
         }
       ]);
       if (detailsError) {
-        // Optionally show an error, or just log it
         console.log('Failed to insert user details:', detailsError.message);
       }
     }
@@ -53,9 +57,21 @@ export default function Signup() {
       <View style={styles.inputWrapper}>
         <Ionicons name="person" size={20} color="#1A3164" style={styles.icon} />
         <TextInput
-          placeholder="Your Name"
-          value={name}
-          onChangeText={setName}
+          placeholder="First Name"
+          value={firstName}
+          onChangeText={setFirstName}
+          autoCapitalize="words"
+          placeholderTextColor="#999"
+          style={styles.input}
+        />
+      </View>
+
+      <View style={styles.inputWrapper}>
+        <Ionicons name="person" size={20} color="#1A3164" style={styles.icon} />
+        <TextInput
+          placeholder="Last Name"
+          value={lastName}
+          onChangeText={setLastName}
           autoCapitalize="words"
           placeholderTextColor="#999"
           style={styles.input}

@@ -19,7 +19,10 @@ export default function Settings() {
 
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => router.push('/account')}
+          >
             <Text style={styles.itemText}>Edit Profile</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.item}>
@@ -38,9 +41,6 @@ export default function Settings() {
               thumbColor={darkMode ? "#fff" : "#1A3164"}
             />
           </View>
-          <TouchableOpacity style={styles.item}>
-            <Text style={styles.itemText}>Notifications</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.section}>

@@ -21,11 +21,15 @@ export default function Home() {
       if (user) {
         const { data } = await supabase
           .from('user_details')
-          .select('first_name')
+          .select('first_name, last_name')
           .eq('uuid', user.id)
           .single();
         if (data?.first_name) {
-          setUserName(data.first_name);
+          setUserName(
+            data.last_name && data.last_name.trim().length > 0
+              ? `${data.first_name} ${data.last_name}`
+              : data.first_name
+          );
         } else {
           setUserName('there');
         }

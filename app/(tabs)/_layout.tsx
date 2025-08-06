@@ -1,4 +1,4 @@
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { Feather, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from "expo-router";
 
 export default function TabLayout() {
@@ -48,12 +48,14 @@ export default function TabLayout() {
           ),
         }}
       />
+      
+
       <Tabs.Screen
-        name="settings"
+        name="create"
         options={{
-          tabBarLabel: "Settings",
+          tabBarLabel: "Create",
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="settings" color={color} size={26} />
+            <Feather name="plus" color={color} size={29} />
           ),
         }}
       />
