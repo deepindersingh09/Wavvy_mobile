@@ -12,7 +12,7 @@ export default function Login() {
   const handleLogin = async () => {
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) return Alert.alert('Login failed', error.message);
-    router.replace('/home'); // Or your actual post-login route
+    router.replace('/home');
   };
 
   return (

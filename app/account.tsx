@@ -1,5 +1,7 @@
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity } from 'react-native';
+import { Alert, SafeAreaView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../lib/supabase';
 
 export default function EditProfile() {
@@ -38,9 +40,17 @@ export default function EditProfile() {
 
   return (
     <SafeAreaView style={{ flex: 1, padding: 24, backgroundColor: '#fff' }}>
-      <Text style={{ fontSize: 22, color: '#1A3164', fontWeight: 'bold', marginBottom: 18 }}>
-        Edit Profile
-      </Text>
+
+       {/* Header with Back Button and Title */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="#1A3164" style={styles.backarrow}/>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Edit Profile</Text>
+        <View style={{ width: 24 }} />
+      </View>
+
+
       <TextInput
         placeholder="First Name"
         value={firstName}
@@ -66,6 +76,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     padding: 12,
     marginBottom: 15,
+    marginHorizontal: 14,
     color: '#1A3164',
   },
   button: {
@@ -73,10 +84,27 @@ const styles = StyleSheet.create({
     padding: 14,
     borderRadius: 10,
     alignItems: 'center',
+    marginHorizontal: 14,
   },
   buttonText: {
     color: '#fff',
     fontWeight: 'bold',
     fontSize: 16,
-  }
+
+  },
+   headerTitle: {
+    fontSize: 22,
+    color: '#1A3164',
+    fontWeight: 'bold',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+    justifyContent: 'space-between',
+  },
+  backarrow: {
+    marginLeft: 12,
+    color: '#1A3164',
+  },
 });
