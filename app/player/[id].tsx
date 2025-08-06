@@ -1,24 +1,24 @@
-import React, { useEffect, useState, useRef } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import { Audio } from 'expo-av';
+import { router, useLocalSearchParams } from 'expo-router';
+import React, { useEffect, useRef, useState } from 'react';
 import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
   ActivityIndicator,
   Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { router, useLocalSearchParams } from 'expo-router';
+import { DeezerTrack, fetchDeezerTrackById } from '../../lib/deezer';
+import { addSongLike, isSongLiked, removeSongLike } from '../../lib/favourite_songs'; // <- use liked_songs!
 import { supabase } from '../../lib/supabase';
-import { isSongLiked, addSongLike, removeSongLike } from '../../lib/favourite_songs';
-import { Audio } from 'expo-av';
-import { AudioDBSong, fetchSongById } from '../../lib/theaudiodb';
 import { recordRecentlyPlayed } from '../../lib/supabase_recently_played';
 
 export default function SongPlayer() {
   const { id } = useLocalSearchParams<{ id: string }>();
 
-  const [song, setSong] = useState<AudioDBSong | null>(null);
+  const [song, setSong] = useState<DeezerTrack | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
@@ -45,8 +45,8 @@ export default function SongPlayer() {
       if (!id) return;
       setLoading(true);
       try {
-        const songData = await fetchSongById(id);
-        setSong(songData);
+        const trackData = await fetchDeezerTrackById(id);
+        setSong(trackData);
       } catch (err) {
         console.error('Failed to fetch song:', err);
         setSong(null);
@@ -81,10 +81,10 @@ export default function SongPlayer() {
     setLikeLoading(true);
     try {
       if (isLiked) {
-        await removeSongLike(userId, song.idTrack);
+        await removeSongLike(userId, song.id.toString());
         setIsLiked(false);
       } else {
-        await addSongLike(userId, song.idTrack);
+        await addSongLike(userId, song.id.toString());
         setIsLiked(true);
       }
     } catch (e) {
@@ -106,7 +106,7 @@ export default function SongPlayer() {
         setIsPlaying(true);
 
         // Record recently played here
-        await recordRecentlyPlayed(userId, song.idTrack);
+        await recordRecentlyPlayed(userId, song.id.toString());
 
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded && !status.isPlaying) {
@@ -122,7 +122,7 @@ export default function SongPlayer() {
           setIsPlaying(true);
 
           // Record recently played here
-          await recordRecentlyPlayed(userId, song.idTrack);
+          await recordRecentlyPlayed(userId, song.id.toString());
         }
       }
     } catch (error) {
@@ -149,18 +149,18 @@ export default function SongPlayer() {
   return (
     <View style={[styles.container, { backgroundColor: '#fff' }]}>
       <View style={{ paddingHorizontal: 20, alignItems: 'center' }}>
-        {song.strTrackThumb ? (
-          <Image source={{ uri: song.strTrackThumb }} style={styles.coverImage} />
+        {song.album?.cover_medium ? (
+          <Image source={{ uri: song.album.cover_medium }} style={styles.coverImage} />
         ) : (
           <View style={[styles.noCoverPlaceholder, { backgroundColor: '#EDF0F7' }]}>
             <Ionicons name="musical-notes-outline" size={96} color="#888" />
           </View>
         )}
 
-        <Text style={[styles.title, { color: '#1A3164' }]}>{song.strTrack}</Text>
-        <Text style={[styles.artist, { color: '#888' }]}>{song.strArtist}</Text>
+        <Text style={[styles.title, { color: '#1A3164' }]}>{song.title}</Text>
+        <Text style={[styles.artist, { color: '#888' }]}>{song.artist.name}</Text>
         <Text style={[styles.album, { color: '#888' }]}>
-          {song.strAlbum} {song.intYearReleased ? `(${song.intYearReleased})` : ''}
+          {song.album?.title}
         </Text>
 
         <TouchableOpacity
