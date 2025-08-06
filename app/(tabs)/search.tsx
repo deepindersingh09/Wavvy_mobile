@@ -1,10 +1,11 @@
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { supabase } from '../../lib/supabase';
+import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { DeezerTrack, searchDeezerTracks } from '../../lib/deezer';
 
 export default function Search() {
   const [search, setSearch] = useState('');
-  const [results, setResults] = useState([]);
+  const [results, setResults] = useState<DeezerTrack[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('All');
 
@@ -21,28 +22,42 @@ export default function Search() {
     { label: 'Lo-fi', color: '#233B7A' },
   ];
 
-  // Fetch search results as user types
   useEffect(() => {
     const fetchResults = async () => {
-      if (search.length === 0) {
+      if (search.length < 2) {
         setResults([]);
         return;
       }
       setIsSearching(true);
-
-      // Example: "tracks" table, filter by selectedFilter (add your real columns)
-      let query = supabase.from('tracks').select('*');
-      if (selectedFilter === 'Artists') query = query.ilike('artist', `%${search}%`);
-      else if (selectedFilter === 'Albums') query = query.ilike('album', `%${search}%`);
-      else if (selectedFilter === 'Playlists') query = query.ilike('playlist', `%${search}%`);
-      else query = query.ilike('title', `%${search}%`);
-
-      const { data, error } = await query.limit(10);
-      setResults(data || []);
+      try {
+        const data = await searchDeezerTracks(search);
+        setResults(data);
+      } catch (e) {
+        setResults([]);
+      }
       setIsSearching(false);
     };
     fetchResults();
-  }, [search, selectedFilter]);
+  }, [search]);
+
+  // JS filtering by chip (since Deezer API returns tracks only)
+  let filteredResults = results;
+  if (selectedFilter === 'Artists') {
+    filteredResults = results.filter(
+      (item, idx, arr) =>
+        arr.findIndex((a) => a.artist.name === item.artist.name) === idx // unique artists
+    );
+  } else if (selectedFilter === 'Albums') {
+    filteredResults = results.filter(
+      (item, idx, arr) =>
+        item.album &&
+        arr.findIndex((a) => a.album?.title === item.album?.title) === idx // unique albums
+    );
+  } else if (selectedFilter === 'Tracks') {
+    filteredResults = results;
+  } else if (selectedFilter === 'Playlists') {
+    filteredResults = []; // Deezer's search API does not return playlists directly
+  }
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -85,7 +100,7 @@ export default function Search() {
         <Text style={styles.subTitle}>Trending searches</Text>
         <View style={styles.suggestionRow}>
           {trending.map((item) => (
-            <TouchableOpacity key={item} style={styles.suggestionChip}>
+            <TouchableOpacity key={item} style={styles.suggestionChip} onPress={() => setSearch(item)}>
               <Text style={styles.suggestionText}>{item}</Text>
             </TouchableOpacity>
           ))}
@@ -93,15 +108,52 @@ export default function Search() {
 
         {/* Live Search Results */}
         {isSearching && <Text style={{ color: '#888', marginVertical: 10 }}>Searching...</Text>}
-        {results.length > 0 && (
+        {filteredResults.length > 0 && (
           <View>
             <Text style={styles.subTitle}>Results</Text>
-            {results.map((item) => (
-              <TouchableOpacity key={item.id} style={styles.resultRow}>
-                <Text style={styles.resultTitle}>{item.title || item.artist || item.album}</Text>
-                <Text style={styles.resultType}>{item.artist || item.album || ''}</Text>
-              </TouchableOpacity>
-            ))}
+            {selectedFilter === 'Artists' &&
+              filteredResults.map((item) => (
+                <TouchableOpacity
+                  key={item.artist.name}
+                  style={styles.resultRow}
+                  onPress={() => setSearch(item.artist.name)}
+                >
+                  <Text style={styles.resultTitle}>{item.artist.name}</Text>
+                  <Text style={styles.resultType}>Artist</Text>
+                </TouchableOpacity>
+              ))}
+            {selectedFilter === 'Albums' &&
+              filteredResults.map((item) => (
+                <TouchableOpacity
+                  key={item.album.title}
+                  style={styles.resultRow}
+                  onPress={() => setSearch(item.album.title)}
+                >
+                  <Text style={styles.resultTitle}>{item.album.title}</Text>
+                  <Text style={styles.resultType}>Album</Text>
+                </TouchableOpacity>
+              ))}
+            {(selectedFilter === 'Tracks' || selectedFilter === 'All') &&
+              filteredResults.map((item) => (
+                <TouchableOpacity
+                  key={item.id}
+                  style={styles.resultRow}
+                  onPress={() => router.push(`/player/${item.id}`)}
+                >
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                    {item.album?.cover_medium && (
+                      <Image source={{ uri: item.album.cover_medium }} style={{ width: 38, height: 38, borderRadius: 7 }} />
+                    )}
+                    <View>
+                      <Text style={styles.resultTitle}>{item.title}</Text>
+                      <Text style={styles.resultType}>{item.artist.name}</Text>
+                    </View>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            {selectedFilter === 'Playlists' && (
+              <Text style={{ color: "#888", marginLeft: 5 }}>Playlist search not supported with Deezer API.</Text>
+            )}
           </View>
         )}
 
@@ -109,7 +161,7 @@ export default function Search() {
         <Text style={styles.subTitle}>Discover</Text>
         <View style={styles.discoverRow}>
           {discover.map((item, i) => (
-            <TouchableOpacity key={i} style={[styles.discoverCard, { backgroundColor: item.color }]}>
+            <TouchableOpacity key={i} style={[styles.discoverCard, { backgroundColor: item.color }]} onPress={() => setSearch(item.label)}>
               <Text style={styles.discoverLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}
