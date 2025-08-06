@@ -1,4 +1,4 @@
-import { Feather, FontAwesome5, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { Tabs } from "expo-router";
 
 export default function TabLayout() {
@@ -13,6 +13,7 @@ export default function TabLayout() {
           borderTopColor: "#eee",
           height: 70,
           paddingBottom: 10,
+          paddingTop: 5,
         },
         tabBarLabelStyle: {
           fontSize: 13,
@@ -24,16 +25,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="home"
         options={{
-          tabBarLabel: "Home",
+          tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="home" color={color} size={27} />
+            <Ionicons name="home" color={color} size={24} />
           ),
         }}
       />
       <Tabs.Screen
         name="search"
         options={{
-          tabBarLabel: "Search",
+           tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" color={color} size={26} />
           ),
@@ -42,23 +43,23 @@ export default function TabLayout() {
       <Tabs.Screen
         name="library"
         options={{
-          tabBarLabel: "Your Library",
+           tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
-            <MaterialCommunityIcons name="library-shelves" color={color} size={26} />
+            <MaterialCommunityIcons name="playlist-music" size={29} color={color} />
           ),
         }}
       />
-      
 
       <Tabs.Screen
-        name="create"
+        name="settings"
         options={{
-          tabBarLabel: "Create",
+           tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
-            <Feather name="plus" color={color} size={29} />
+            <FontAwesome name="gear" color={color} size={25} />
           ),
         }}
       />
+
     </Tabs>
   );
 }
