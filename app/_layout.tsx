@@ -1,5 +1,10 @@
 import { Stack } from "expo-router";
+import { PlayerProvider } from "../lib/playercontext";
 
 export default function Layout() {
-  return <Stack screenOptions={{ headerShown: false }} />;
+  return (
+    <PlayerProvider>
+      <Stack screenOptions={{ headerShown: false }} />
+    </PlayerProvider>
+  );
 }
