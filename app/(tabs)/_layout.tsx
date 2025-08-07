@@ -11,8 +11,7 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: "#fff",
           borderTopColor: "#eee",
-          height: 70,
-          paddingBottom: 10,
+          height: 85,
           paddingTop: 5,
         },
         tabBarLabelStyle: {
@@ -34,7 +33,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="search"
         options={{
-           tabBarShowLabel: false,
+          tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="search" color={color} size={26} />
           ),
@@ -43,7 +42,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="library"
         options={{
-           tabBarShowLabel: false,
+          tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
             <MaterialCommunityIcons name="playlist-music" size={29} color={color} />
           ),
@@ -53,7 +52,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="settings"
         options={{
-           tabBarShowLabel: false,
+          tabBarShowLabel: false,
           tabBarIcon: ({ color, size }) => (
             <FontAwesome name="gear" color={color} size={25} />
           ),

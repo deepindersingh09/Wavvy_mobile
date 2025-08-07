@@ -32,8 +32,11 @@ export default function Home() {
 
   const recommended = [
     { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
-    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
     { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
+    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
+    { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
+    { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
+    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
   ];
 
   const popular = [
@@ -110,7 +113,7 @@ export default function Home() {
             <Text style={styles.jumpSong}>Until I Found You</Text>
             <Text style={styles.jumpArtist}>Stephen Sanchez</Text>
           </View>
-            <Ionicons name="pause" size={28} color="#fff" style={styles.jumpPauseIcon}/>
+          <Ionicons name="play" size={28} color="#fff" style={styles.jumpPlayIcon} />
 
         </TouchableOpacity>
 
@@ -166,17 +169,28 @@ export default function Home() {
           </TouchableOpacity>
         </View>
 
-
         {/* Trending Near You */}
-        <Text style={styles.sectionTitle}>Trending Near you</Text>
-        <View style={styles.trendingRow}>
+        <Text style={styles.sectionTitle}>Trending Near You</Text>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.trendingRow}
+        >
           {recommended.map((item, i) => (
-            <TouchableOpacity key={i} style={styles.trendingCard} onPress={() => router.push(`/playlist/${item.title.toLowerCase().replace(/\s/g, '-')}`)}>
+            <TouchableOpacity
+              key={i}
+              style={styles.trendingCard}
+              onPress={() =>
+                router.push(`/playlist/${item.title.toLowerCase().replace(/\s/g, '-')}`)
+              }
+            >
               <Image source={item.image} style={styles.trendingImage} />
               <Text style={styles.trendingText}>{item.title}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
+
 
         {/* Popular Songs */}
         <Text style={styles.sectionTitle}>Popular Songs</Text>
@@ -269,14 +283,14 @@ const styles = StyleSheet.create({
     color: '#666',
     fontSize: 10,
   },
-  jumpPauseIcon: {
+  jumpPlayIcon: {
     marginRight: 10,
     alignSelf: 'center',
   },
 
-  trendingRow: { flexDirection: 'row', gap: 12, marginBottom: 16 },
-  trendingCard: { backgroundColor: '#fff', borderRadius: 12, elevation: 2, alignItems: 'center', width: width * 0.28 },
-  trendingImage: { width: '100%', height: 100, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
+  trendingRow: { flexDirection: 'row', gap: 15, marginBottom: 16 },
+  trendingCard: { backgroundColor: '#fff', borderRadius: 12, elevation: 2, alignItems: 'center', width: width * 0.30 },
+  trendingImage: { width: '100%', height: 120, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
   trendingText: { padding: 6, fontWeight: '700', color: '#1A3164', textAlign: 'center', fontSize: 12 },
 
   popularRow: { marginBottom: 16 },

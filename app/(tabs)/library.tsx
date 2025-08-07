@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
 import { ActivityIndicator, Modal, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { supabase } from '../../lib/supabase';
@@ -72,6 +74,11 @@ export default function Library() {
   // Render
   return (
     <SafeAreaView style={styles.safeArea}>
+
+     <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="#1A3164" style={{marginTop: 45, marginLeft: 15}}/>
+        </TouchableOpacity>
+
       <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
         {/* Top Bar */}
         <View style={styles.topBar}>

@@ -1,63 +1,106 @@
 import { useRouter } from 'expo-router';
-import { Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import React from 'react';
+import {
+  Dimensions,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from 'react-native';
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withRepeat,
+  withTiming,
+} from 'react-native-reanimated';
+
+const { width } = Dimensions.get('window');
 
 export default function Landing() {
   const router = useRouter();
+  const rotation = useSharedValue(0);
+
+  React.useEffect(() => {
+    rotation.value = withRepeat(
+      withTiming(360, { duration: 8000 }),
+      -1,
+      false
+    );
+  }, []);
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [{ rotate: `${rotation.value}deg` }],
+    };
+  });
 
   return (
     <View style={styles.container}>
-      <Image
-        source={require('../assets/images/wavvy-logo.png')}
-        style={styles.logo}
-      />
+      <View style={styles.centerContent}>
+        <Animated.Image
+          source={require('../assets/images/wavvy-logo.png')}
+          style={[styles.logo, animatedStyle]}
+        />
+        <Text style={styles.title}>Wavvy</Text>
+      </View>
 
-      <Text style={styles.title}>Welcome to Wavvy</Text>
+      <View style={styles.buttonRow}>
+        <TouchableOpacity
+          style={[styles.button, { marginRight: 10 }]}
+          onPress={() => router.push('/auth/login')}
+        >
+          <Text style={styles.buttonText}>Login</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push('/auth/login')}
-      >
-        <Text style={styles.buttonText}>Login to your account</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={() => router.push('/auth/signup')}
-      >
-        <Text style={styles.buttonText}>Signup to the app</Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={() => router.push('/auth/signup')}
+        >
+          <Text style={styles.buttonText}>Signup</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
+
+const BUTTON_WIDTH = (width * 0.9 - 10) / 2; // Two buttons side by side with 10px gap
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#FFFFFF',
-    justifyContent: 'center',
+    justifyContent: 'space-between',
     alignItems: 'center',
     paddingHorizontal: 24,
+    paddingVertical: 50,
+  },
+  centerContent: {
+    alignItems: 'center',
+    marginTop: '40%',
   },
   logo: {
-    width: 120,
-    height: 120,
+    width: 90,
+    height: 90,
     resizeMode: 'contain',
-    marginBottom: 12,
+    marginTop: 130,
   },
   title: {
     fontSize: 22,
-    fontWeight: '600',
-    color: '#1A3164', 
+    fontWeight: '700',
+    color: '#1A3164',
     fontFamily: 'System',
-    marginBottom: 40,
+    marginTop: 12,
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
   button: {
     backgroundColor: '#1A3164',
     paddingVertical: 14,
-    paddingHorizontal: 30,
     borderRadius: 30,
-    marginVertical: 10,
-    width: '90%',
+    width: BUTTON_WIDTH,
+    justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',
     shadowOpacity: 0.1,

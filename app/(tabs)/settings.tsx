@@ -122,7 +122,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     backgroundColor: '#EDF0F7',
     borderRadius: 13,
-    paddingVertical: 14,
+    paddingVertical: 3,
     paddingHorizontal: 18,
     marginBottom: 10,
   },
@@ -139,6 +139,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginBottom: 24,
+    marginTop: 22
   },
   sideContainer: {
     width: 30,

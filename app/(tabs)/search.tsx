@@ -1,13 +1,25 @@
+import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import { DeezerTrack, searchDeezerTracks } from '../../lib/deezer';
+
+const { width } = Dimensions.get('window');
 
 export default function Search() {
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<DeezerTrack[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('All');
+
+  const recommended = [
+    { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
+    { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
+    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
+    { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
+    { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
+    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
+  ];
 
   // Filter chips
   const filters = ['All', 'Artists', 'Albums', 'Playlists', 'Tracks'];
@@ -40,7 +52,6 @@ export default function Search() {
     fetchResults();
   }, [search]);
 
-  // JS filtering by chip (since Deezer API returns tracks only)
   let filteredResults = results;
   if (selectedFilter === 'Artists') {
     filteredResults = results.filter(
@@ -61,6 +72,15 @@ export default function Search() {
 
   return (
     <SafeAreaView style={styles.safeArea}>
+
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={24} color="#1A3164" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Explore</Text>
+        <View style={{ width: 24 }} />
+      </View>
+
       <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
         {/* Search bar */}
         <View style={styles.searchBar}>
@@ -159,13 +179,35 @@ export default function Search() {
 
         {/* Discover Section */}
         <Text style={styles.subTitle}>Discover</Text>
-        <View style={styles.discoverRow}>
+
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.trendingRow}
+        >
+          {recommended.map((item, i) => (
+            <TouchableOpacity
+              key={i}
+              style={styles.trendingCard}
+              onPress={() =>
+                router.push(`/playlist/${item.title.toLowerCase().replace(/\s/g, '-')}`)
+              }
+            >
+              <Image source={item.image} style={styles.trendingImage} />
+              <Text style={styles.trendingText}>{item.title}</Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
+
+
+        {/* <View style={styles.discoverRow}>
           {discover.map((item, i) => (
             <TouchableOpacity key={i} style={[styles.discoverCard, { backgroundColor: item.color }]} onPress={() => setSearch(item.label)}>
               <Text style={styles.discoverLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </View> */}
+
       </ScrollView>
     </SafeAreaView>
   );
@@ -173,7 +215,21 @@ export default function Search() {
 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
-  container: { padding: 16, backgroundColor: '#fff' },
+  container: { padding: 16, backgroundColor: '#fff', flex: 1 },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    paddingBottom: 0,
+    backgroundColor: '#fff',
+    marginTop: 50,
+  },
+  headerTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1A3164',
+  },
   searchBar: {
     backgroundColor: '#EDF0F7',
     borderRadius: 13,
@@ -235,4 +291,8 @@ const styles = StyleSheet.create({
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
+  trendingRow: { flexDirection: 'row', gap: 15, marginBottom: 16 },
+  trendingCard: { backgroundColor: '#fff', borderRadius: 12, elevation: 2, alignItems: 'center', width: width * 0.30, marginBottom: 10 },
+  trendingImage: { width: '100%', height: 120, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
+  trendingText: { padding: 6, fontWeight: '700', color: '#1A3164', textAlign: 'center', fontSize: 12 },
 });
