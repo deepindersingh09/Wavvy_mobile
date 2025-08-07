@@ -1,5 +1,5 @@
 import { useLocalSearchParams } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function PlaylistScreen() {
   const { id } = useLocalSearchParams();
@@ -7,7 +7,6 @@ export default function PlaylistScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Playlist: {id}</Text>
-      {/* Add real playlist logic here */}
     </View>
   );
 }

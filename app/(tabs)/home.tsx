@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import {
   Dimensions,
@@ -9,9 +10,8 @@ import {
   TouchableOpacity,
   View
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import { supabase } from '../../lib/supabase';
 import { usePlayer } from '../../lib/playercontext';
+import { supabase } from '../../lib/supabase';
 
 const { width } = Dimensions.get('window');
 
@@ -30,21 +30,21 @@ export default function Home() {
   const filters = ['All', 'English', 'Punjabi', 'Hindi'];
 
   const recommended = [
-    { title: 'Punjabi Hits' },
-    { title: 'Chill Mix' },
-    { title: 'Lo-fi' },
+    { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
+    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
+    { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
   ];
 
   const popular = [
-    { title: 'Supreme', artist: 'Shubh', id: '3135556' },
-    { title: 'August', artist: 'Taylor Swift', id: '1109731' },
-    { title: 'Water', artist: 'Diljit Dosanjh', id: '129888030' },
-    { title: 'Levitating', artist: 'Taylor Swift', id: '13468026' },
+    { title: 'Supreme', artist: 'Shubh', id: '3135556', image: require('../../assets/images/supreme.png') },
+    { title: 'August', artist: 'Taylor Swift', id: '1109731', image: require('../../assets/images/august.png') },
+    { title: 'Water', artist: 'Diljit Dosanjh', id: '129888030', image: require('../../assets/images/water.png') },
+    { title: 'Levitating', artist: 'Taylor Swift', id: '13468026', image: require('../../assets/images/levitating.png') },
   ];
 
   const recent = [
-    { title: 'Hasse', artist: 'Nirvair Pannu', id: '1196063402'},
-    { title: 'Attraction', artist: 'Sukha, ProdGK', id: '1109731' },
+    { title: 'Hasse', artist: 'Nirvair Pannu', id: '1196063402', image: require('../../assets/images/hasse.png') },
+    { title: 'Attraction', artist: 'Sukha, ProdGK', id: '1109731', image: require('../../assets/images/attraction.png') },
   ];
 
   useEffect(() => {
