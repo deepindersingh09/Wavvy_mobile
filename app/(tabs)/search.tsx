@@ -1,6 +1,7 @@
-import React, { useContext, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
+import { useSearchParams } from 'expo-router/build/hooks';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -20,15 +21,22 @@ const { width } = Dimensions.get('window');
 export default function Search() {
   const { darkMode } = useContext(ThemeContext);
 
+  const params = useSearchParams();
   const [search, setSearch] = useState('');
+  const query = params.get('q') || '';
+
+  useEffect(() => {
+    if (query && query !== search) {
+      setSearch(query);
+    }
+  }, [query]);
+
+
   const [results, setResults] = useState<DeezerTrack[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState('All');
 
   const recommended = [
-    { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
-    { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
-    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
     { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
     { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
     { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
@@ -267,9 +275,7 @@ export default function Search() {
                 styles.trendingCard,
                 { backgroundColor: darkMode ? '#222' : '#fff' },
               ]}
-              onPress={() =>
-                router.push(`/playlist/${item.title.toLowerCase().replace(/\s/g, '-')}`)
-              }
+              onPress={() => router.push(`/search?q=${encodeURIComponent(item.title)}`)}
             >
               <Image source={item.image} style={styles.trendingImage} />
               <Text
@@ -280,6 +286,7 @@ export default function Search() {
             </TouchableOpacity>
           ))}
         </ScrollView>
+
 
         {/* Uncomment if you want to re-enable Discover cards */}
         {/* <View style={styles.discoverRow}>

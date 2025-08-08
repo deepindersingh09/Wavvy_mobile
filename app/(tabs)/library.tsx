@@ -13,11 +13,11 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
-import { ThemeContext } from '../../lib/ThemeContext'; // import context
+import { ThemeContext } from '../../lib/ThemeContext';
 
 export default function Library() {
   const router = useRouter();
-  const { darkMode } = useContext(ThemeContext);  // get darkMode from context
+  const { darkMode } = useContext(ThemeContext);  
  
   const categories = ['Playlists', 'Albums', 'Artists'];
   const [activeCategory, setActiveCategory] = useState('Playlists');
