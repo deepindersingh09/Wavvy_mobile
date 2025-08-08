@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -13,7 +13,7 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
-import { ThemeContext } from '../../lib/ThemeContext';  // import context
+import { ThemeContext } from '../../lib/ThemeContext'; // import context
 
 export default function Library() {
   const router = useRouter();
@@ -26,7 +26,7 @@ export default function Library() {
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
-  const [sort, setSort] = useState('recent'); // Or 'name'
+  const [sort, setSort] = useState('recent'); 
   const [showPinned, setShowPinned] = useState(false);
 
   const fetchPlaylists = async () => {

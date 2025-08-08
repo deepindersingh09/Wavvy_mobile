@@ -1,6 +1,5 @@
-import React, { useContext, useEffect, useState } from 'react';
-import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   Dimensions,
   Image,
@@ -11,9 +10,10 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import { fetchDeezerTrackById } from '../../lib/deezer';
 import { usePlayer } from '../../lib/playercontext';
 import { supabase } from '../../lib/supabase';
-import { ThemeContext } from '../../lib/ThemeContext';  // Import ThemeContext
+import { ThemeContext } from '../../lib/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
@@ -80,6 +80,94 @@ export default function Home() {
     fetchName();
   }, []);
 
+
+  // details for jump back in section
+  // Fetch user info on mount
+  useEffect(() => {
+    async function fetchUser() {
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        setUserId(null);
+        setUserName('there!');
+        return;
+      }
+      setUserId(user.id);
+
+      // Fetch user name from your user_details table
+      const { data, error: nameError } = await supabase
+        .from('user_details')
+        .select('first_name, last_name')
+        .eq('uuid', user.id)
+        .single();
+
+      if (nameError || !data?.first_name) {
+        setUserName('there!');
+      } else {
+        setUserName(
+          data.last_name && data.last_name.trim().length > 0
+            ? `${data.first_name} ${data.last_name}`
+            : data.first_name
+        );
+      }
+    }
+
+    fetchUser();
+  }, []);
+
+  // State for loading recent songs and recent songs data
+  const [loadingRecent, setLoadingRecent] = useState(false);
+  const [recentSongs, setRecentSongs] = useState<any[]>([]);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // Fetch recently played songs when userId is available
+  useEffect(() => {
+    async function fetchRecentlyPlayed() {
+      if (!userId) return;
+
+      setLoadingRecent(true);
+      try {
+        const { data: recentData, error } = await supabase
+          .from('recently_played')
+          .select('song_id')
+          .eq('user_id', userId)
+          .order('played_at', { ascending: false })
+          .limit(5);
+
+        if (error) {
+          console.error('Error fetching recently played songs:', error);
+          setRecentSongs([]);
+          return;
+        }
+
+        if (recentData?.length) {
+          // Fetch track details for each song_id
+          const tracks = await Promise.all(
+            recentData.map(async (item) => {
+              try {
+                return await fetchDeezerTrackById(item.song_id);
+              } catch (e) {
+                console.error(`Failed fetching track ${item.song_id}`, e);
+                return null;
+              }
+            })
+          );
+
+          // Filter out any failed fetches (nulls)
+          setRecentSongs(tracks.filter(Boolean));
+        } else {
+          setRecentSongs([]);
+        }
+      } catch (err) {
+        console.error('Failed to fetch recently played:', err);
+        setRecentSongs([]);
+      } finally {
+        setLoadingRecent(false);
+      }
+    }
+
+    fetchRecentlyPlayed();
+  }, [userId]);
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView
@@ -113,84 +201,113 @@ export default function Home() {
         </View>
 
         {/* Jump Back In */}
+        {/* <Text style={styles.sectionTitle}>Jump back in</Text> */}
+
+        {/* <Text style={styles.sectionTitle}>Jump back in</Text>
+
+        {loadingRecent ? (
+          <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>Loading...</Text>
+        ) : recentSongs.length === 0 ? (
+          <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>
+            No recent songs played yet.
+          </Text>
+        ) : (
+          <>
+            {recentSongs[0] && (
+              <TouchableOpacity
+                key={`large-${recentSongs[0].id}`}
+                style={styles.jumpCardLarge}
+                onPress={() => router.push(`/player/${recentSongs[0].id}`)}
+              >
+                <Image
+                  source={{ uri: recentSongs[0].album.cover_medium }}
+                  style={styles.jumpImageLarge}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.jumpSongLarge}>{recentSongs[0].title}</Text>
+                  <Text style={styles.jumpArtistLarge}>{recentSongs[0].artist.name}</Text>
+                </View>
+              </TouchableOpacity>
+            )}
+
+            <View style={styles.jumpGrid}>
+              {recentSongs.slice(1, 5).map((song, index) => (
+                <TouchableOpacity
+                  key={`small-${index}-${song.id}`} // Unique keys with index + id
+                  style={styles.jumpCardSmall}
+                  onPress={() => router.push(`/player/${song.id}`)}
+                >
+                  <Image
+                    source={{ uri: song.album.cover_medium }}
+                    style={styles.jumpImageSmall}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.jumpSongSmall}>{song.title}</Text>
+                    <Text style={styles.jumpArtistSmall}>{song.artist.name}</Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )} */}
+
+        {/* Jump Back In */}
         <Text style={styles.sectionTitle}>Jump back in</Text>
 
-        <TouchableOpacity
-          style={styles.jumpCard}
-          onPress={() => router.push('/player/1474534502')}
-        >
-          <Image
-            source={require('../../assets/images/until_i_found.png')}
-            style={styles.jumpImage}
-          />
+        {loadingRecent ? (
+          <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>Loading...</Text>
+        ) : recentSongs.length === 0 ? (
+          <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>
+            No recent songs played yet.
+          </Text>
+        ) : (
+          <>
+            {/* First song - Large card */}
+            {recentSongs[0] && (
+              <TouchableOpacity
+                key={`large-${recentSongs[0].id}`}
+                style={[styles.jumpCardLarge, { backgroundColor: darkMode ? '#333' : '#EDF0F7' }]}
+                onPress={() => router.push(`/player/${recentSongs[0].id}`)}
+              >
+                <Image
+                  source={{ uri: recentSongs[0].album.cover_medium }}
+                  style={styles.jumpImageLarge}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.jumpSongLarge, { color: darkMode ? '#fff' : '#1A3164' }]}>
+                    {recentSongs[0].title}
+                  </Text>
+                  <Text style={[styles.jumpArtistLarge, { color: darkMode ? '#bbb' : '#1A3164' }]}>
+                    {recentSongs[0].artist.name}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
 
-          <View style={{ flex: 1 }}>
-            <Text style={styles.jumpSong}>Until I Found You</Text>
-            <Text style={styles.jumpArtist}>Stephen Sanchez</Text>
-          </View>
-          <Ionicons name="play" size={28} color="#fff" style={styles.jumpPlayIcon} />
-        </TouchableOpacity>
-
-        {/* Song Tiles */}
-        <View style={styles.jumpRow}>
-          <TouchableOpacity
-            style={styles.jumpTileHorizontal}
-            onPress={() => router.push('/player/117708444')}
-          >
-            <Image
-              source={require('../../assets/images/unstoppable_.png')}
-              style={styles.jumpTileImageSmall}
-            />
-            <View>
-              <Text style={styles.jumpTileText}>Unstoppable</Text>
-              <Text style={styles.jumpTileSubText}>Sia</Text>
+            {/* Next 4 songs - grid (2 per row) */}
+            <View style={styles.jumpGrid}>
+              {recentSongs.slice(1, 5).map((song, index) => (
+                <TouchableOpacity
+                  key={`small-${index}-${song.id}`}
+                  style={[styles.jumpCardSmall, { backgroundColor: darkMode ? '#333' : '#EDF0F7' }]}
+                  onPress={() => router.push(`/player/${song.id}`)}>
+                  <Image
+                    source={{ uri: song.album.cover_medium }}
+                    style={styles.jumpImageSmall}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.jumpSongSmall, { color: darkMode ? '#fff' : '#1A3164' }]}>
+                      {song.title}
+                    </Text>
+                    <Text style={[styles.jumpArtistSmall, { color: darkMode ? '#bbb' : '#1A3164' }]}>
+                      {song.artist.name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
             </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.jumpTileHorizontal}
-            onPress={() => router.push('/player/3422339821')}
-          >
-            <Image
-              source={require('../../assets/images/postivity_.png')}
-              style={styles.jumpTileImageSmall}
-            />
-            <View>
-              <Text style={styles.jumpTileText}>Positivity</Text>
-              <Text style={styles.jumpTileSubText}>Jordan Sandhu</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
-
-        <View style={styles.jumpRow}>
-          <TouchableOpacity
-            style={styles.jumpTileHorizontal}
-            onPress={() => router.push('/player/1505527562')}
-          >
-            <Image
-              source={require('../../assets/images/jaan_.png')}
-              style={styles.jumpTileImageSmall}
-            />
-            <View>
-              <Text style={styles.jumpTileText}>Jaan</Text>
-              <Text style={styles.jumpTileSubText}>Nimrat Khaira</Text>
-            </View>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.jumpTileHorizontal}
-            onPress={() => router.push('/player/3140442331')}
-          >
-            <Image
-              source={require('../../assets/images/majhail_.png')}
-              style={styles.jumpTileImageSmall}
-            />
-            <View>
-              <Text style={styles.jumpTileText}>Majhail</Text>
-              <Text style={styles.jumpTileSubText}>Prem Dhillon</Text>
-            </View>
-          </TouchableOpacity>
-        </View>
+          </>
+        )}
 
         {/* Trending Near You */}
         <Text style={styles.sectionTitle}>Trending Near You</Text>
@@ -296,44 +413,70 @@ const themedStyles = (darkMode: boolean) =>
       marginTop: 2,
       marginBottom: 8,
     },
-    jumpCard: {
+    jumpCardLarge: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#1A3164',
+      backgroundColor: '#EDF0F7',
       borderRadius: 12,
-      gap: 10,
-      marginBottom: 10,
-      marginRight: 6,
+      gap: 4,
+      marginBottom: 12,
+      padding: 5,
+
     },
-    jumpImage: {
-      width: 55,
+    jumpImageLarge: {
+      width: 52,
       height: 55,
       borderRadius: 8,
+      marginRight: 5,
     },
-    jumpSong: {
-      color: '#fff',
-      fontSize: 15,
+    jumpSongLarge: {
+      color: '#1A3164',
+      fontSize: 14,
       fontWeight: '700',
-      marginLeft: 5,
     },
-    jumpArtist: {
-      color: '#eee',
-      fontSize: 10,
-      marginLeft: 5,
+    jumpArtistLarge: {
+      color: '#1A3164',
+      fontSize: 12,
     },
-    jumpRow: {
+    jumpGrid: {
       flexDirection: 'row',
-      gap: 4,
-      marginBottom: 16,
+      flexWrap: 'wrap',
+      justifyContent: 'space-between',
+      gap: 1,
     },
+    jumpCardSmall: {
+      width: (width - 48) / 2,
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: '#EDF0F7',
+      borderRadius: 12,
+      padding: 8,
+      marginBottom: 8,
+    },
+    jumpImageSmall: {
+      width: 50,
+      height: 50,
+      borderRadius: 8,
+      marginRight: 8,
+    },
+    jumpSongSmall: {
+      color: '#1A3164',
+      fontSize: 14,
+      fontWeight: '600',
+    },
+    jumpArtistSmall: {
+      color: '#1A3164',
+      fontSize: 12,
+    },
+
     jumpTileHorizontal: {
       backgroundColor: darkMode ? '#333' : '#EDF0F7',
       borderRadius: 10,
       flexDirection: 'row',
       alignItems: 'center',
-      gap: 10,
+      gap: 5,
       flex: 1,
-      marginRight: 8,
+      marginRight: 4,
     },
     jumpTileImageSmall: {
       width: 50,
@@ -353,6 +496,7 @@ const themedStyles = (darkMode: boolean) =>
       marginRight: 10,
       alignSelf: 'center',
     },
+
     trendingRow: {
       flexDirection: 'row',
       gap: 15,

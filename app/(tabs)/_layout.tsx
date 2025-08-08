@@ -1,7 +1,7 @@
-import React, { useContext } from 'react';
-import { FontAwesome, Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
+import { FontAwesome, Ionicons } from '@expo/vector-icons';
 import { Tabs } from 'expo-router';
-import { ThemeProvider, ThemeContext } from '../../lib/ThemeContext';
+import React, { useContext } from 'react';
+import { ThemeContext, ThemeProvider } from '../../lib/ThemeContext';
 
 function ThemedTabs() {
   const { darkMode } = useContext(ThemeContext);
@@ -47,7 +47,7 @@ function ThemedTabs() {
         name="library"
         options={{
           tabBarShowLabel: false,
-          tabBarIcon: ({ color }) => <MaterialCommunityIcons name="playlist-music" size={29} color={color} />,
+          tabBarIcon: ({ color }) => <Ionicons name="musical-notes" size={26} color={color} />,
         }}
       />
       <Tabs.Screen

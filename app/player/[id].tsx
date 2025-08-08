@@ -12,13 +12,14 @@ import {
   TouchableOpacity,
   View,
 } from 'react-native';
+import CustomTabBar from '../../components/CustomTabBar';
 import { DeezerTrack, fetchDeezerTrackById } from '../../lib/deezer';
 import { addSongLike, isSongLiked, removeSongLike } from '../../lib/favourite_songs';
 import { supabase } from '../../lib/supabase';
 import { recordRecentlyPlayed } from '../../lib/supabase_recently_played';
- 
+
 const SCREEN_WIDTH = Dimensions.get('window').width;
- 
+
 // Demo track list
 const demoTrackList = [
   '3135556',
@@ -27,7 +28,7 @@ const demoTrackList = [
   '1196063402',
   '13468026'
 ];
- 
+
 export default function SongPlayer() {
   useEffect(() => {
     Audio.setAudioModeAsync({
@@ -40,36 +41,39 @@ export default function SongPlayer() {
       playThroughEarpieceAndroid: false,
     });
   }, []);
- 
+
   const { id } = useLocalSearchParams<{ id: string }>();
- 
+
   const [trackList] = useState(demoTrackList);
   const [currentIdx, setCurrentIdx] = useState(
     demoTrackList.findIndex((tid) => tid === id)
   );
- 
+
   const [song, setSong] = useState<DeezerTrack | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
- 
+
   const [isLiked, setIsLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
- 
+
   const [userId, setUserId] = useState<string | null>(null);
- 
+
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(30);
   const [shuffle, setShuffle] = useState(false);
- 
+
+  const SCREEN_WIDTH = Dimensions.get('window').width;
+  const BAR_WIDTH = SCREEN_WIDTH * 0.9; // 90% of screen width
+
   // NEW: Repeat and Volume
   const [repeat, setRepeat] = useState(false);
   const [volume, setVolume] = useState(1);
- 
+
   const goToSongById = (songId: string) => {
     router.replace(`/player/${songId}`);
   };
- 
+
   const handleNext = () => {
     if (!trackList.length) return;
     if (shuffle) {
@@ -83,7 +87,7 @@ export default function SongPlayer() {
       goToSongById(trackList[nextIdx]);
     }
   };
- 
+
   const handlePrev = () => {
     if (!trackList.length) return;
     if (shuffle) {
@@ -97,18 +101,18 @@ export default function SongPlayer() {
       goToSongById(trackList[prevIdx]);
     }
   };
- 
+
   const toggleShuffle = () => setShuffle((v) => !v);
- 
+
   // Add to Playlist button handler
   const onAddToPlaylist = () => {
     alert("Show playlist picker here!");
   };
- 
+
   useEffect(() => {
     setCurrentIdx(trackList.findIndex((tid) => tid === id));
   }, [id, trackList]);
- 
+
   useEffect(() => {
     async function fetchUserId() {
       const { data, error } = await supabase.auth.getUser();
@@ -120,7 +124,7 @@ export default function SongPlayer() {
     }
     fetchUserId();
   }, []);
- 
+
   useEffect(() => {
     async function loadSong() {
       if (!id) return;
@@ -136,10 +140,10 @@ export default function SongPlayer() {
       }
     }
     loadSong();
- 
+
     setPosition(0);
     setDuration(30);
- 
+
     return () => {
       if (soundRef.current) {
         soundRef.current.unloadAsync();
@@ -148,7 +152,7 @@ export default function SongPlayer() {
       setIsPlaying(false);
     };
   }, [id]);
- 
+
   useEffect(() => {
     if (!id || !userId) {
       setIsLiked(false);
@@ -159,21 +163,21 @@ export default function SongPlayer() {
       setIsLiked(liked);
     })();
   }, [id, userId]);
- 
+
   // Set repeat on sound instance
   useEffect(() => {
     if (soundRef.current) {
       soundRef.current.setIsLoopingAsync(repeat);
     }
   }, [repeat]);
- 
+
   // Set volume on sound instance
   useEffect(() => {
     if (soundRef.current) {
       soundRef.current.setVolumeAsync(volume);
     }
   }, [volume]);
- 
+
   const toggleLike = async () => {
     if (!userId || !song) return;
     setLikeLoading(true);
@@ -191,7 +195,7 @@ export default function SongPlayer() {
       setLikeLoading(false);
     }
   };
- 
+
   const onPlayPause = async () => {
     if (!song?.preview || !userId) return;
     try {
@@ -207,7 +211,7 @@ export default function SongPlayer() {
         soundRef.current = sound;
         setIsPlaying(true);
         await recordRecentlyPlayed(userId, song.id.toString());
- 
+
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded) {
             setPosition((status.positionMillis || 0) / 1000);
@@ -229,20 +233,20 @@ export default function SongPlayer() {
       console.error('Audio playback error:', error);
     }
   };
- 
+
   const onSeek = async (seekTo: number) => {
     if (soundRef.current) {
       await soundRef.current.setPositionAsync(seekTo * 1000);
       setPosition(seekTo);
     }
   };
- 
+
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
- 
+
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -250,7 +254,7 @@ export default function SongPlayer() {
       </View>
     );
   }
- 
+
   if (!song) {
     return (
       <View style={styles.centered}>
@@ -258,10 +262,20 @@ export default function SongPlayer() {
       </View>
     );
   }
- 
+
   return (
     <View style={[styles.container, { backgroundColor: '#fff' }]}>
-      <View style={{ paddingHorizontal: 20, alignItems: 'center' }}>
+
+      {/* Header Bar */}
+      <View style={{ width: '100%', paddingHorizontal: 20, paddingTop: 10, flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 10 }}>
+        {/* <TouchableOpacity onPress={() => router.back()}>
+          <Ionicons name="arrow-back" size={28} color="#1A3164" />
+        </TouchableOpacity> */}
+        <Text style={{ fontSize: 18, fontWeight: '700', color: '#1A3164' }}>Now Playing</Text>
+        <View style={{ width: 28 }} />
+      </View>
+
+      <View style={{ paddingHorizontal: 15, alignItems: 'center' }}>
         {song.album?.cover_medium ? (
           <Image source={{ uri: song.album.cover_medium }} style={styles.coverImage} />
         ) : (
@@ -269,27 +283,111 @@ export default function SongPlayer() {
             <Ionicons name="musical-notes-outline" size={96} color="#888" />
           </View>
         )}
- 
+
         <Text style={[styles.title, { color: '#1A3164' }]}>{song.title}</Text>
         <Text style={[styles.artist, { color: '#888' }]}>{song.artist.name}</Text>
         <Text style={[styles.album, { color: '#888' }]}>{song.album?.title}</Text>
- 
-        {/* Repeat + Volume Row */}
-        <View style={{ flexDirection: 'row', gap: 24, alignItems: 'center', marginBottom: 16 }}>
+
+        {/* Progress Bar */}
+
+        <View style={{ width: SCREEN_WIDTH * 0.9, alignSelf: 'center', marginTop: 1 }}>
+          {/* Seek Slider */}
+          <Slider
+            style={{ width: '100%', height: 40 }}
+            minimumValue={0}
+            maximumValue={duration}
+            value={position}
+            minimumTrackTintColor="#1A3164"
+            maximumTrackTintColor="#696969ff"
+            thumbTintColor="#1A3164"
+            onSlidingComplete={value => onSeek(value)}
+          />
+
+          {/* Time Labels */}
+          <View style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between',
+            marginTop: -5,
+          }}>
+            <Text style={{ color: '#1A3164', fontWeight: '600', fontSize: 12 }}>
+              {formatTime(position)}
+            </Text>
+            <Text style={{ color: '#1A3164', fontWeight: '600', fontSize: 12 }}>
+              {formatTime(duration)}
+            </Text>
+          </View>
+        </View>
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            marginTop: 8,
+            paddingHorizontal: 15,
+          }}>
+
           {/* Repeat */}
-          <TouchableOpacity onPress={() => setRepeat((r) => !r)}>
+          <TouchableOpacity onPress={() => setRepeat(r => !r)} activeOpacity={0.7}>
             <Ionicons
               name="repeat"
-              size={26}
+              size={28}
               color={repeat ? "#1A3164" : "#888"}
-              style={{ opacity: repeat ? 1 : 0.5 }}
+              style={{ opacity: repeat ? 1 : 0.5, marginRight: 30 }}
             />
           </TouchableOpacity>
-          {/* Volume */}
-          <View style={{ flex: 1 }}>
-            <Text style={{ color: '#1A3164', fontSize: 12, fontWeight: '500', marginBottom: 4 }}>Volume</Text>
+
+          {/* Previous */}
+          <TouchableOpacity onPress={handlePrev} activeOpacity={0.7}>
+            <Ionicons name="play-skip-back" size={32} color="#1A3164" style={{ marginHorizontal: 20 }} />
+          </TouchableOpacity>
+
+          {/* Play / Pause */}
+          <TouchableOpacity
+            onPress={onPlayPause}
+            activeOpacity={0.7}
+            disabled={!song.preview}
+            style={{ marginHorizontal: 20 }}>
+            <Ionicons
+              name={isPlaying ? 'pause-circle' : 'play-circle'}
+              size={65}
+              color={song.preview ? '#1A3164' : '#ccc'}
+            />
+          </TouchableOpacity>
+
+          {/* Next */}
+          <TouchableOpacity onPress={handleNext} activeOpacity={0.7}>
+            <Ionicons name="play-skip-forward" size={32} color="#1A3164" style={{ marginHorizontal: 20 }} />
+          </TouchableOpacity>
+
+          {/* Shuffle */}
+          <TouchableOpacity onPress={toggleShuffle} activeOpacity={0.7}>
+            <Ionicons
+              name="shuffle"
+              size={28}
+              color={shuffle ? "#1A3164" : "#888"}
+              style={{ opacity: shuffle ? 1 : 0.5, marginLeft: 30 }}
+            />
+          </TouchableOpacity>
+        </View>
+
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'space-between',
+            width: '100%',
+            alignSelf: 'center',
+            marginTop: 20,
+            marginBottom: 10,
+          }}>
+
+          {/* Right side: Volume Control */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', width: 150, gap: 8 }}>
+            <Ionicons name="volume-medium" size={20} color="#1A3164" />
             <Slider
-              style={{ width: '100%' }}
+              style={{ flex: 1, height: 40 }}
               minimumValue={0}
               maximumValue={1}
               value={volume}
@@ -299,115 +397,32 @@ export default function SongPlayer() {
               thumbTintColor="#1A3164"
             />
           </View>
-        </View>
- 
-        {/* Seek Bar */}
-        <View style={styles.seekBarContainer}>
-          <TouchableOpacity
-            style={styles.seekBarBackground}
-            activeOpacity={0.8}
-            onPress={e => {
-              const touchX = (e.nativeEvent as any).locationX || 0;
-              const percent = touchX / (SCREEN_WIDTH - 40);
-              onSeek(percent * duration);
-            }}
-          >
-            <View style={[styles.seekBarFill, { width: `${(position / duration) * 100}%` }]} />
-          </TouchableOpacity>
-          <View style={styles.seekBarTimes}>
-            <Text style={styles.timeText}>{formatTime(position)}</Text>
-            <Text style={styles.timeText}>{formatTime(duration)}</Text>
+
+          {/* Left side: Like and Playlist buttons close together */}
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 20 }}>
+            {/* Like Button */}
+            <TouchableOpacity onPress={toggleLike} disabled={likeLoading}>
+              <Ionicons
+                name={isLiked ? 'heart' : 'heart-outline'}
+                size={36}
+                color={isLiked ? '#1A3164' : '#aaa'}
+              />
+            </TouchableOpacity>
+
+            {/* Add to Playlist Button */}
+            <TouchableOpacity onPress={onAddToPlaylist}>
+              <Ionicons name="add-circle-outline" size={36} color="#1A3164" />
+            </TouchableOpacity>
           </View>
         </View>
- 
-        {/* Player Controls Row */}
-        <View style={styles.controlsRow}>
-          <TouchableOpacity onPress={handlePrev}>
-            <Ionicons name="play-skip-back" size={32} color="#1A3164" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={toggleShuffle}>
-            <Ionicons
-              name="shuffle"
-              size={32}
-              color={shuffle ? "#1A3164" : "#888"}
-              style={shuffle ? { opacity: 1 } : { opacity: 0.5 }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={onPlayPause}
-            style={styles.playPauseButton}
-            disabled={!song.preview}
-          >
-            <Ionicons
-              name={isPlaying ? 'pause-circle' : 'play-circle'}
-              size={78}
-              color={song.preview ? '#1A3164' : '#ccc'}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleNext}>
-            <Ionicons name="play-skip-forward" size={32} color="#1A3164" />
-          </TouchableOpacity>
-        </View>
- 
-        {/* Like + Add to Playlist Row */}
-        <View style={{ flexDirection: "row", gap: 22, marginTop: 18, justifyContent: "center" }}>
-          {/* Like */}
-          <TouchableOpacity onPress={toggleLike} disabled={likeLoading}>
-            <Ionicons
-              name={isLiked ? 'heart' : 'heart-outline'}
-              size={36}
-              color={isLiked ? '#1A3164' : '#aaa'}
-            />
-          </TouchableOpacity>
-          {/* Add to Playlist */}
-          <TouchableOpacity onPress={onAddToPlaylist}>
-            <Ionicons name="add-circle-outline" size={36} color="#1A3164" />
-          </TouchableOpacity>
-        </View>
- 
-        {!song.preview && (
-          <Text style={[styles.noPreviewText, { color: '#888' }]}>
-            No audio preview available.
-          </Text>
-        )}
       </View>
- 
-      {/* FooterBar (unchanged) */}
-      <View style={styles.footerBar}>
-        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.fabNormal}
-            onPress={() => router.replace('/library')}
-          >
-            <Ionicons name="musical-notes-outline" size={30} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.fabLabel}>Library</Text>
-        </View>
- 
-        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.fabNormal}
-            onPress={() => router.replace('/home')}
-          >
-            <Ionicons name="home-outline" size={30} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.fabLabel}>Home</Text>
-        </View>
- 
-        <View style={{ flexDirection: 'column', alignItems: 'center' }}>
-          <TouchableOpacity
-            style={styles.fabNormal}
-            onPress={() => router.replace('/settings')}
-          >
-            <Ionicons name="settings-outline" size={36} color="#fff" />
-          </TouchableOpacity>
-          <Text style={styles.fabLabel}>Settings</Text>
-        </View>
-      </View>
+
+    <CustomTabBar />
+
     </View>
   );
 }
- 
+
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
@@ -417,11 +432,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   coverImage: {
-    width: 260,
-    height: 260,
-    borderRadius: 24, // Large radius for rounded look
-    marginTop: 16,
-    marginBottom: 30,
+    width: 340,
+    height: 340,
+    borderRadius: 0,
+    marginTop: 50,
+    marginBottom: 10,
     alignSelf: 'center',
   },
   noCoverPlaceholder: {
@@ -436,23 +451,22 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
   },
   title: {
-    fontSize: 28,
+    fontSize: 22,
     fontWeight: '700',
     color: '#233B7A',
     textAlign: 'center',
-    marginBottom: 2,
   },
   artist: {
-    fontSize: 18,
+    fontSize: 14,
     color: '#8a8b97',
     textAlign: 'center',
     fontWeight: '600',
   },
   album: {
-    fontSize: 15,
+    fontSize: 12,
     color: '#b0b2be',
     textAlign: 'center',
-    marginBottom: 18,
+    marginBottom: 5,
     marginTop: 0,
     fontWeight: '400',
   },
@@ -465,23 +479,17 @@ const styles = StyleSheet.create({
     width: '90%',
     alignSelf: 'center',
   },
-  seekBarContainer: {
-    width: '90%',
-    alignSelf: 'center',
-    marginTop: 18,
-    marginBottom: 10,
-  },
   seekBarBackground: {
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#e8ebf3',
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: 'rgba(255,0,0,0.1)',
     width: '100%',
     overflow: 'hidden',
-    marginBottom: 5,
+    position: 'relative',
   },
   seekBarFill: {
-    height: 6,
-    borderRadius: 3,
+    height: 8,
+    borderRadius: 4,
     backgroundColor: '#233B7A',
     position: 'absolute',
     left: 0,
@@ -491,7 +499,7 @@ const styles = StyleSheet.create({
   seekBarTimes: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 0,
+    marginTop: 5,
   },
   timeText: {
     color: '#233B7A',
@@ -514,7 +522,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   playPauseButton: {
-    marginHorizontal: 12,
+    marginHorizontal: 4,
   },
   actionRow: {
     flexDirection: "row",
@@ -539,39 +547,5 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
   },
- 
-  footerBar: {
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    width: "100%",
-    backgroundColor: "#233B7A",
-    borderTopLeftRadius: 30,
-    borderTopRightRadius: 30,
-    flexDirection: "row",
-    alignItems: "flex-end",
-    justifyContent: "space-around",
-    paddingVertical: 14,
-    zIndex: 3,
-    shadowColor: "#000",
-    shadowOpacity: 0.10,
-    shadowOffset: { width: 0, height: -4 },
-    shadowRadius: 16,
-    elevation: 15,
-  },
-  fabNormal: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: "#233B7A",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  fabLabel: {
-    color: "#fff",
-    fontSize: 15,
-    fontWeight: "700",
-    marginTop: 6,
-    textAlign: "center",
-  },
+
 });
