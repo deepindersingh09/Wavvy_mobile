@@ -34,25 +34,24 @@ export default function Home() {
     { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
     { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
     { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
-    { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png') },
-    { title: 'Lo-fi', image: require('../../assets/images/lofi.png') },
-    { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
   ];
 
   const popular = [
-    { title: 'Supreme', artist: 'Shubh', id: '3135556', image: require('../../assets/images/supreme.png') },
-    { title: 'August', artist: 'Taylor Swift', id: '1109731', image: require('../../assets/images/august.png') },
-    { title: 'Water', artist: 'Diljit Dosanjh', id: '129888030', image: require('../../assets/images/water.png') },
-    { title: 'Levitating', artist: 'Taylor Swift', id: '13468026', image: require('../../assets/images/levitating.png') },
+    { title: 'Cheques', artist: 'Shubh', id: '2282321217', image: require('../../assets/images/supreme.png') },
+    { title: 'August', artist: 'Taylor Swift', id: '1053765282', image: require('../../assets/images/august.png') },
+    { title: 'Sada Aura', artist: 'Dulla', id: '3461561831', image: require('../../assets/images/water.png') },
+    { title: 'Khairiyat', artist: 'Arijit Singh', id: '3174180021', image: require('../../assets/images/levitating.png') },
+    { title: 'Jine Saah', artist: 'Dulla', id: '370172031', image: require('../../assets/images/water.png') },
+    { title: 'Jatta', artist: 'Arijit Singh', id: '1594140971', image: require('../../assets/images/levitating.png') },
   ];
 
   const recent = [
-    { title: 'Hasse', artist: 'Nirvair Pannu', id: '1196063402', image: require('../../assets/images/hasse.png') },
-    { title: 'Attraction', artist: 'Sukha, ProdGK', id: '1109731', image: require('../../assets/images/attraction.png') },
-    { title: 'abc', artist: 'Nirvair Pannu', id: '1196063402', image: require('../../assets/images/hasse.png') },
-    { title: 'xyz', artist: 'Sukha, ProdGK', id: '1109731', image: require('../../assets/images/attraction.png') },
-    { title: 'klj', artist: 'Sukha, ProdGK', id: '1109731', image: require('../../assets/images/attraction.png') },
-  ];
+    { title: 'Bandook', artist: 'Nirvair Pannu', id: '972650742', image: require('../../assets/images/hasse.png') },
+    { title: 'Attraction', artist: 'Sukha, ProdGK', id: '2361725765', image: require('../../assets/images/attraction.png') },
+    { title: 'Barfest', artist: 'Nirvair Pannu', id: '2705113272', image: require('../../assets/images/hasse.png') },
+    { title: 'Pasand Jatt Di', artist: 'Nirvair Pannu', id: '3270662611', image: require('../../assets/images/attraction.png') },
+    { title: 'Neal', artist: 'Sidhu Moosewala', id: '3408975791', image: require('../../assets/images/attraction.png') },
+  ];  
 
   useEffect(() => {
     const fetchName = async () => {
@@ -103,7 +102,7 @@ export default function Home() {
 
         <TouchableOpacity
           style={styles.jumpCard}
-          onPress={() => router.push('/player/3135556')}>
+          onPress={() => router.push('/player/1474534502')}>
           <Image
             source={require('../../assets/images/until_i_found.png')}
             style={styles.jumpImage}
@@ -119,25 +118,25 @@ export default function Home() {
 
         <View style={styles.jumpRow}>
           {/* Song Tile */}
-          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/1109731')}>
+          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/117708444')}>
             <Image
               source={require('../../assets/images/eminem.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
-              <Text style={styles.jumpTileText}>Lose Yourself</Text>
-              <Text style={styles.jumpTileSubText}>Eminem</Text>
+              <Text style={styles.jumpTileText}>Unstoppable</Text>
+              <Text style={styles.jumpTileSubText}>Sia</Text>
             </View>
           </TouchableOpacity>
 
           {/* Playlist Tile */}
-          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/playlist/playlist1')}>
+          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/3422339821')}>
             <Image
               source={require('../../assets/images/alpha.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
-              <Text style={styles.jumpTileText}>Alpha</Text>
+              <Text style={styles.jumpTileText}>Positivity</Text>
               <Text style={styles.jumpTileSubText}>Jordan Sandhu</Text>
             </View>
           </TouchableOpacity>
@@ -145,26 +144,26 @@ export default function Home() {
 
         <View style={styles.jumpRow}>
           {/* Song Tile */}
-          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/1109731')}>
+          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/1505527562')}>
             <Image
               source={require('../../assets/images/eminem.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
-              <Text style={styles.jumpTileText}>Lose Yourself</Text>
-              <Text style={styles.jumpTileSubText}>Eminem</Text>
+              <Text style={styles.jumpTileText}>Jaan</Text>
+              <Text style={styles.jumpTileSubText}>Nimrat Khaira</Text>
             </View>
           </TouchableOpacity>
 
           {/* Playlist Tile */}
-          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/playlist/playlist1')}>
+          <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/3140442331')}>
             <Image
               source={require('../../assets/images/alpha.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
-              <Text style={styles.jumpTileText}>Alpha</Text>
-              <Text style={styles.jumpTileSubText}>Jordan Sandhu</Text>
+              <Text style={styles.jumpTileText}>Majhail</Text>
+              <Text style={styles.jumpTileSubText}>Prem Dhillon</Text>
             </View>
           </TouchableOpacity>
         </View>
@@ -289,12 +288,12 @@ const styles = StyleSheet.create({
   },
 
   trendingRow: { flexDirection: 'row', gap: 15, marginBottom: 16 },
-  trendingCard: { backgroundColor: '#fff', borderRadius: 12, elevation: 2, alignItems: 'center', width: width * 0.30 },
+  trendingCard: { backgroundColor: '#fff', borderRadius: 12, elevation: 2, alignItems: 'center', width: width * 0.28 },
   trendingImage: { width: '100%', height: 120, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
   trendingText: { padding: 6, fontWeight: '700', color: '#1A3164', textAlign: 'center', fontSize: 12 },
 
   popularRow: { marginBottom: 16 },
-  popularItem: { alignItems: 'center', marginRight: 7, marginLeft: 7 },
+  popularItem: { alignItems: 'center', marginRight: 8, marginLeft: 8 },
   popularImage: { width: 80, height: 80, borderRadius: 40 },
   popularTitle: { color: '#1A3164', fontWeight: '700', fontSize: 13 },
   popularArtist: { color: '#888', fontSize: 10 },

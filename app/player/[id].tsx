@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons';
-import Slider from '@react-native-community/slider'; // <-- ADD THIS
+import Slider from '@react-native-community/slider';
 import { Audio } from 'expo-av';
 import { router, useLocalSearchParams } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
