@@ -16,9 +16,9 @@ import { DeezerTrack, fetchDeezerTrackById } from '../../lib/deezer';
 import { addSongLike, isSongLiked, removeSongLike } from '../../lib/favourite_songs';
 import { supabase } from '../../lib/supabase';
 import { recordRecentlyPlayed } from '../../lib/supabase_recently_played';
-
+ 
 const SCREEN_WIDTH = Dimensions.get('window').width;
-
+ 
 // Demo track list
 const demoTrackList = [
   '3135556',
@@ -27,7 +27,7 @@ const demoTrackList = [
   '1196063402',
   '13468026'
 ];
-
+ 
 export default function SongPlayer() {
   useEffect(() => {
     Audio.setAudioModeAsync({
@@ -40,36 +40,36 @@ export default function SongPlayer() {
       playThroughEarpieceAndroid: false,
     });
   }, []);
-
+ 
   const { id } = useLocalSearchParams<{ id: string }>();
-
+ 
   const [trackList] = useState(demoTrackList);
   const [currentIdx, setCurrentIdx] = useState(
     demoTrackList.findIndex((tid) => tid === id)
   );
-
+ 
   const [song, setSong] = useState<DeezerTrack | null>(null);
   const [loading, setLoading] = useState(true);
   const [isPlaying, setIsPlaying] = useState(false);
   const soundRef = useRef<Audio.Sound | null>(null);
-
+ 
   const [isLiked, setIsLiked] = useState(false);
   const [likeLoading, setLikeLoading] = useState(false);
-
+ 
   const [userId, setUserId] = useState<string | null>(null);
-
+ 
   const [position, setPosition] = useState(0);
   const [duration, setDuration] = useState(30);
   const [shuffle, setShuffle] = useState(false);
-
+ 
   // NEW: Repeat and Volume
   const [repeat, setRepeat] = useState(false);
   const [volume, setVolume] = useState(1);
-
+ 
   const goToSongById = (songId: string) => {
     router.replace(`/player/${songId}`);
   };
-
+ 
   const handleNext = () => {
     if (!trackList.length) return;
     if (shuffle) {
@@ -83,7 +83,7 @@ export default function SongPlayer() {
       goToSongById(trackList[nextIdx]);
     }
   };
-
+ 
   const handlePrev = () => {
     if (!trackList.length) return;
     if (shuffle) {
@@ -97,18 +97,18 @@ export default function SongPlayer() {
       goToSongById(trackList[prevIdx]);
     }
   };
-
+ 
   const toggleShuffle = () => setShuffle((v) => !v);
-
+ 
   // Add to Playlist button handler
   const onAddToPlaylist = () => {
     alert("Show playlist picker here!");
   };
-
+ 
   useEffect(() => {
     setCurrentIdx(trackList.findIndex((tid) => tid === id));
   }, [id, trackList]);
-
+ 
   useEffect(() => {
     async function fetchUserId() {
       const { data, error } = await supabase.auth.getUser();
@@ -120,7 +120,7 @@ export default function SongPlayer() {
     }
     fetchUserId();
   }, []);
-
+ 
   useEffect(() => {
     async function loadSong() {
       if (!id) return;
@@ -136,10 +136,10 @@ export default function SongPlayer() {
       }
     }
     loadSong();
-
+ 
     setPosition(0);
     setDuration(30);
-
+ 
     return () => {
       if (soundRef.current) {
         soundRef.current.unloadAsync();
@@ -148,7 +148,7 @@ export default function SongPlayer() {
       setIsPlaying(false);
     };
   }, [id]);
-
+ 
   useEffect(() => {
     if (!id || !userId) {
       setIsLiked(false);
@@ -159,21 +159,21 @@ export default function SongPlayer() {
       setIsLiked(liked);
     })();
   }, [id, userId]);
-
+ 
   // Set repeat on sound instance
   useEffect(() => {
     if (soundRef.current) {
       soundRef.current.setIsLoopingAsync(repeat);
     }
   }, [repeat]);
-
+ 
   // Set volume on sound instance
   useEffect(() => {
     if (soundRef.current) {
       soundRef.current.setVolumeAsync(volume);
     }
   }, [volume]);
-
+ 
   const toggleLike = async () => {
     if (!userId || !song) return;
     setLikeLoading(true);
@@ -191,7 +191,7 @@ export default function SongPlayer() {
       setLikeLoading(false);
     }
   };
-
+ 
   const onPlayPause = async () => {
     if (!song?.preview || !userId) return;
     try {
@@ -207,7 +207,7 @@ export default function SongPlayer() {
         soundRef.current = sound;
         setIsPlaying(true);
         await recordRecentlyPlayed(userId, song.id.toString());
-
+ 
         sound.setOnPlaybackStatusUpdate((status) => {
           if (status.isLoaded) {
             setPosition((status.positionMillis || 0) / 1000);
@@ -229,20 +229,20 @@ export default function SongPlayer() {
       console.error('Audio playback error:', error);
     }
   };
-
+ 
   const onSeek = async (seekTo: number) => {
     if (soundRef.current) {
       await soundRef.current.setPositionAsync(seekTo * 1000);
       setPosition(seekTo);
     }
   };
-
+ 
   const formatTime = (sec: number) => {
     const m = Math.floor(sec / 60);
     const s = Math.floor(sec % 60);
     return `${m}:${s < 10 ? '0' : ''}${s}`;
   };
-
+ 
   if (loading) {
     return (
       <View style={styles.centered}>
@@ -250,7 +250,7 @@ export default function SongPlayer() {
       </View>
     );
   }
-
+ 
   if (!song) {
     return (
       <View style={styles.centered}>
@@ -258,7 +258,7 @@ export default function SongPlayer() {
       </View>
     );
   }
-
+ 
   return (
     <View style={[styles.container, { backgroundColor: '#fff' }]}>
       <View style={{ paddingHorizontal: 20, alignItems: 'center' }}>
@@ -269,11 +269,11 @@ export default function SongPlayer() {
             <Ionicons name="musical-notes-outline" size={96} color="#888" />
           </View>
         )}
-
+ 
         <Text style={[styles.title, { color: '#1A3164' }]}>{song.title}</Text>
         <Text style={[styles.artist, { color: '#888' }]}>{song.artist.name}</Text>
         <Text style={[styles.album, { color: '#888' }]}>{song.album?.title}</Text>
-
+ 
         {/* Repeat + Volume Row */}
         <View style={{ flexDirection: 'row', gap: 24, alignItems: 'center', marginBottom: 16 }}>
           {/* Repeat */}
@@ -300,7 +300,7 @@ export default function SongPlayer() {
             />
           </View>
         </View>
-
+ 
         {/* Seek Bar */}
         <View style={styles.seekBarContainer}>
           <TouchableOpacity
@@ -319,7 +319,7 @@ export default function SongPlayer() {
             <Text style={styles.timeText}>{formatTime(duration)}</Text>
           </View>
         </View>
-
+ 
         {/* Player Controls Row */}
         <View style={styles.controlsRow}>
           <TouchableOpacity onPress={handlePrev}>
@@ -348,7 +348,7 @@ export default function SongPlayer() {
             <Ionicons name="play-skip-forward" size={32} color="#1A3164" />
           </TouchableOpacity>
         </View>
-
+ 
         {/* Like + Add to Playlist Row */}
         <View style={{ flexDirection: "row", gap: 22, marginTop: 18, justifyContent: "center" }}>
           {/* Like */}
@@ -364,14 +364,14 @@ export default function SongPlayer() {
             <Ionicons name="add-circle-outline" size={36} color="#1A3164" />
           </TouchableOpacity>
         </View>
-
+ 
         {!song.preview && (
           <Text style={[styles.noPreviewText, { color: '#888' }]}>
             No audio preview available.
           </Text>
         )}
       </View>
-
+ 
       {/* FooterBar (unchanged) */}
       <View style={styles.footerBar}>
         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
@@ -383,7 +383,7 @@ export default function SongPlayer() {
           </TouchableOpacity>
           <Text style={styles.fabLabel}>Library</Text>
         </View>
-
+ 
         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
           <TouchableOpacity
             style={styles.fabNormal}
@@ -393,7 +393,7 @@ export default function SongPlayer() {
           </TouchableOpacity>
           <Text style={styles.fabLabel}>Home</Text>
         </View>
-
+ 
         <View style={{ flexDirection: 'column', alignItems: 'center' }}>
           <TouchableOpacity
             style={styles.fabNormal}
@@ -407,7 +407,7 @@ export default function SongPlayer() {
     </View>
   );
 }
-
+ 
 const styles = StyleSheet.create({
   container: {
     backgroundColor: '#fff',
@@ -539,7 +539,7 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
     textAlign: 'center',
   },
-  
+ 
   footerBar: {
     position: "absolute",
     bottom: 0,
@@ -575,4 +575,3 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
 });
-

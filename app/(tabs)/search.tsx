@@ -1,12 +1,25 @@
+import React, { useContext, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
-import { useEffect, useState } from 'react';
-import { Dimensions, Image, SafeAreaView, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import {
+  Dimensions,
+  Image,
+  SafeAreaView,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from 'react-native';
 import { DeezerTrack, searchDeezerTracks } from '../../lib/deezer';
+import { ThemeContext } from '../../lib/ThemeContext';
 
 const { width } = Dimensions.get('window');
 
 export default function Search() {
+  const { darkMode } = useContext(ThemeContext);
+
   const [search, setSearch] = useState('');
   const [results, setResults] = useState<DeezerTrack[]>([]);
   const [isSearching, setIsSearching] = useState(false);
@@ -21,13 +34,10 @@ export default function Search() {
     { title: 'Chill Mix', image: require('../../assets/images/chill_mix.png') },
   ];
 
-  // Filter chips
   const filters = ['All', 'Artists', 'Albums', 'Playlists', 'Tracks'];
 
-  // Recent/trending searches (static demo for now)
   const trending = ['#recession pop', '#afrobeats', '#bollywood', '#clean girl'];
 
-  // Discover demo cards
   const discover = [
     { label: 'Punjabi Hits', color: '#EC51B6' },
     { label: 'Chill Mix', color: '#5EC2EA' },
@@ -71,25 +81,32 @@ export default function Search() {
   }
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-
-      <View style={styles.header}>
+    <SafeAreaView style={[styles.safeArea, { backgroundColor: darkMode ? '#121212' : '#fff' }]}>
+      <View style={[styles.header, { backgroundColor: darkMode ? '#121212' : '#fff' }]}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Ionicons name="arrow-back" size={24} color="#1A3164" />
+          <Ionicons name="arrow-back" size={24} color={darkMode ? '#fff' : '#1A3164'} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Explore</Text>
+        <Text style={[styles.headerTitle, { color: darkMode ? '#fff' : '#1A3164' }]}>Explore</Text>
         <View style={{ width: 24 }} />
       </View>
 
-      <ScrollView style={styles.container} keyboardShouldPersistTaps="handled">
+      <ScrollView
+        style={[styles.container, { backgroundColor: darkMode ? '#121212' : '#fff' }]}
+        keyboardShouldPersistTaps="handled"
+      >
         {/* Search bar */}
-        <View style={styles.searchBar}>
+        <View
+          style={[
+            styles.searchBar,
+            { backgroundColor: darkMode ? '#222' : '#EDF0F7' },
+          ]}
+        >
           <TextInput
             value={search}
             onChangeText={setSearch}
             placeholder="What do you want to listen to?"
-            placeholderTextColor="#888"
-            style={styles.input}
+            placeholderTextColor={darkMode ? '#aaa' : '#888'}
+            style={[styles.input, { color: darkMode ? '#fff' : '#1A3164' }]}
           />
         </View>
 
@@ -100,14 +117,20 @@ export default function Search() {
               key={filter}
               style={[
                 styles.filterChip,
-                selectedFilter === filter && styles.activeChip,
+                selectedFilter === filter && {
+                  backgroundColor: '#1A3164',
+                },
+                !darkMode && selectedFilter !== filter && styles.filterChip,
+                darkMode && selectedFilter !== filter && { backgroundColor: '#222' },
               ]}
               onPress={() => setSelectedFilter(filter)}
             >
               <Text
                 style={[
                   styles.filterChipText,
-                  selectedFilter === filter && styles.activeChipText,
+                  selectedFilter === filter
+                    ? { color: '#fff' }
+                    : { color: darkMode ? '#ddd' : '#1A3164' },
                 ]}
               >
                 {filter}
@@ -117,68 +140,120 @@ export default function Search() {
         </View>
 
         {/* Trending/recent searches */}
-        <Text style={styles.subTitle}>Trending searches</Text>
+        <Text style={[styles.subTitle, { color: darkMode ? '#eee' : '#1A3164' }]}>
+          Trending searches
+        </Text>
         <View style={styles.suggestionRow}>
           {trending.map((item) => (
-            <TouchableOpacity key={item} style={styles.suggestionChip} onPress={() => setSearch(item)}>
-              <Text style={styles.suggestionText}>{item}</Text>
+            <TouchableOpacity
+              key={item}
+              style={[
+                styles.suggestionChip,
+                { backgroundColor: darkMode ? '#222' : '#EDF0F7' },
+              ]}
+              onPress={() => setSearch(item)}
+            >
+              <Text
+                style={[
+                  styles.suggestionText,
+                  { color: darkMode ? '#ddd' : '#1A3164' },
+                ]}
+              >
+                {item}
+              </Text>
             </TouchableOpacity>
           ))}
         </View>
 
         {/* Live Search Results */}
-        {isSearching && <Text style={{ color: '#888', marginVertical: 10 }}>Searching...</Text>}
+        {isSearching && (
+          <Text style={{ color: darkMode ? '#aaa' : '#888', marginVertical: 10 }}>
+            Searching...
+          </Text>
+        )}
         {filteredResults.length > 0 && (
           <View>
-            <Text style={styles.subTitle}>Results</Text>
+            <Text style={[styles.subTitle, { color: darkMode ? '#eee' : '#1A3164' }]}>
+              Results
+            </Text>
             {selectedFilter === 'Artists' &&
               filteredResults.map((item) => (
                 <TouchableOpacity
                   key={item.artist.name}
-                  style={styles.resultRow}
+                  style={[
+                    styles.resultRow,
+                    { borderBottomColor: darkMode ? '#333' : '#eee' },
+                  ]}
                   onPress={() => setSearch(item.artist.name)}
                 >
-                  <Text style={styles.resultTitle}>{item.artist.name}</Text>
-                  <Text style={styles.resultType}>Artist</Text>
+                  <Text style={[styles.resultTitle, { color: darkMode ? '#fff' : '#1A3164' }]}>
+                    {item.artist.name}
+                  </Text>
+                  <Text style={[styles.resultType, { color: darkMode ? '#bbb' : '#666' }]}>
+                    Artist
+                  </Text>
                 </TouchableOpacity>
               ))}
             {selectedFilter === 'Albums' &&
               filteredResults.map((item) => (
                 <TouchableOpacity
                   key={item.album.title}
-                  style={styles.resultRow}
+                  style={[
+                    styles.resultRow,
+                    { borderBottomColor: darkMode ? '#333' : '#eee' },
+                  ]}
                   onPress={() => setSearch(item.album.title)}
                 >
-                  <Text style={styles.resultTitle}>{item.album.title}</Text>
-                  <Text style={styles.resultType}>Album</Text>
+                  <Text style={[styles.resultTitle, { color: darkMode ? '#fff' : '#1A3164' }]}>
+                    {item.album.title}
+                  </Text>
+                  <Text style={[styles.resultType, { color: darkMode ? '#bbb' : '#666' }]}>
+                    Album
+                  </Text>
                 </TouchableOpacity>
               ))}
             {(selectedFilter === 'Tracks' || selectedFilter === 'All') &&
               filteredResults.map((item) => (
                 <TouchableOpacity
                   key={item.id}
-                  style={styles.resultRow}
+                  style={[
+                    styles.resultRow,
+                    { borderBottomColor: darkMode ? '#333' : '#eee' },
+                  ]}
                   onPress={() => router.push(`/player/${item.id}`)}
                 >
                   <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
                     {item.album?.cover_medium && (
-                      <Image source={{ uri: item.album.cover_medium }} style={{ width: 38, height: 38, borderRadius: 7 }} />
+                      <Image
+                        source={{ uri: item.album.cover_medium }}
+                        style={{ width: 38, height: 38, borderRadius: 7 }}
+                      />
                     )}
                     <View>
-                      <Text style={styles.resultTitle}>{item.title}</Text>
-                      <Text style={styles.resultType}>{item.artist.name}</Text>
+                      <Text
+                        style={[styles.resultTitle, { color: darkMode ? '#fff' : '#1A3164' }]}
+                      >
+                        {item.title}
+                      </Text>
+                      <Text
+                        style={[styles.resultType, { color: darkMode ? '#bbb' : '#666' }]}
+                      >
+                        {item.artist.name}
+                      </Text>
                     </View>
                   </View>
                 </TouchableOpacity>
               ))}
             {selectedFilter === 'Playlists' && (
-              <Text style={{ color: "#888", marginLeft: 5 }}>Playlist search not supported with Deezer API.</Text>
+              <Text style={{ color: darkMode ? '#888' : '#888', marginLeft: 5 }}>
+                Playlist search not supported with Deezer API.
+              </Text>
             )}
           </View>
         )}
 
         {/* Discover Section */}
-        <Text style={styles.subTitle}>Discover</Text>
+        <Text style={[styles.subTitle, { color: darkMode ? '#eee' : '#1A3164' }]}>Discover</Text>
 
         <ScrollView
           horizontal
@@ -188,50 +263,57 @@ export default function Search() {
           {recommended.map((item, i) => (
             <TouchableOpacity
               key={i}
-              style={styles.trendingCard}
+              style={[
+                styles.trendingCard,
+                { backgroundColor: darkMode ? '#222' : '#fff' },
+              ]}
               onPress={() =>
                 router.push(`/playlist/${item.title.toLowerCase().replace(/\s/g, '-')}`)
               }
             >
               <Image source={item.image} style={styles.trendingImage} />
-              <Text style={styles.trendingText}>{item.title}</Text>
+              <Text
+                style={[styles.trendingText, { color: darkMode ? '#ddd' : '#1A3164' }]}
+              >
+                {item.title}
+              </Text>
             </TouchableOpacity>
           ))}
         </ScrollView>
 
-
+        {/* Uncomment if you want to re-enable Discover cards */}
         {/* <View style={styles.discoverRow}>
           {discover.map((item, i) => (
-            <TouchableOpacity key={i} style={[styles.discoverCard, { backgroundColor: item.color }]} onPress={() => setSearch(item.label)}>
+            <TouchableOpacity
+              key={i}
+              style={[styles.discoverCard, { backgroundColor: item.color }]}
+              onPress={() => setSearch(item.label)}
+            >
               <Text style={styles.discoverLabel}>{item.label}</Text>
             </TouchableOpacity>
           ))}
         </View> */}
-
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fff' },
-  container: { padding: 16, backgroundColor: '#fff', flex: 1 },
+  safeArea: { flex: 1 },
+  container: { padding: 16, flex: 1 },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     paddingBottom: 0,
-    backgroundColor: '#fff',
     marginTop: 50,
   },
   headerTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#1A3164',
   },
   searchBar: {
-    backgroundColor: '#EDF0F7',
     borderRadius: 13,
     paddingHorizontal: 14,
     height: 46,
@@ -240,7 +322,6 @@ const styles = StyleSheet.create({
   },
   input: {
     fontSize: 16,
-    color: '#1A3164',
     fontWeight: '500',
   },
   filterRow: {
@@ -251,31 +332,51 @@ const styles = StyleSheet.create({
   filterChip: {
     paddingHorizontal: 15,
     paddingVertical: 7,
-    backgroundColor: '#EDF0F7',
     borderRadius: 19,
   },
-  filterChipText: { color: '#1A3164', fontWeight: '500' },
-  activeChip: { backgroundColor: '#1A3164' },
-  activeChipText: { color: '#fff' },
-  subTitle: { marginTop: 18, marginBottom: 7, fontWeight: '700', color: '#1A3164', fontSize: 16 },
-  suggestionRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 9 },
+  filterChipText: {
+    fontWeight: '500',
+  },
+  subTitle: {
+    marginTop: 18,
+    marginBottom: 7,
+    fontWeight: '700',
+    fontSize: 16,
+  },
+  suggestionRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 9,
+  },
   suggestionChip: {
-    backgroundColor: '#EDF0F7',
     borderRadius: 15,
     paddingHorizontal: 13,
     paddingVertical: 6,
     marginBottom: 6,
     marginRight: 8,
   },
-  suggestionText: { color: '#1A3164', fontWeight: '700', fontSize: 13 },
+  suggestionText: {
+    fontWeight: '700',
+    fontSize: 13,
+  },
   resultRow: {
     paddingVertical: 12,
     borderBottomWidth: 1,
-    borderBottomColor: '#eee',
   },
-  resultTitle: { color: '#1A3164', fontWeight: '700', fontSize: 15 },
-  resultType: { color: '#666', fontSize: 13, marginTop: 1 },
-  discoverRow: { flexDirection: 'row', gap: 11, marginTop: 8, marginBottom: 15 },
+  resultTitle: {
+    fontWeight: '700',
+    fontSize: 15,
+  },
+  resultType: {
+    fontSize: 13,
+    marginTop: 1,
+  },
+  discoverRow: {
+    flexDirection: 'row',
+    gap: 11,
+    marginTop: 8,
+    marginBottom: 15,
+  },
   discoverCard: {
     width: 105,
     height: 120,
@@ -284,15 +385,34 @@ const styles = StyleSheet.create({
     padding: 12,
   },
   discoverLabel: {
-    color: '#fff',
     fontWeight: '700',
     fontSize: 15,
     textShadowColor: 'rgba(0,0,0,0.3)',
     textShadowOffset: { width: 1, height: 1 },
     textShadowRadius: 2,
   },
-  trendingRow: { flexDirection: 'row', gap: 15, marginBottom: 16 },
-  trendingCard: { backgroundColor: '#fff', borderRadius: 12, elevation: 2, alignItems: 'center', width: width * 0.30, marginBottom: 10 },
-  trendingImage: { width: '100%', height: 120, borderTopLeftRadius: 12, borderTopRightRadius: 12 },
-  trendingText: { padding: 6, fontWeight: '700', color: '#1A3164', textAlign: 'center', fontSize: 12 },
+  trendingRow: {
+    flexDirection: 'row',
+    gap: 15,
+    marginBottom: 16,
+  },
+  trendingCard: {
+    borderRadius: 12,
+    elevation: 2,
+    alignItems: 'center',
+    width: width * 0.3,
+    marginBottom: 10,
+  },
+  trendingImage: {
+    width: '100%',
+    height: 120,
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+  },
+  trendingText: {
+    padding: 6,
+    fontWeight: '700',
+    fontSize: 12,
+    textAlign: 'center',
+  },
 });
