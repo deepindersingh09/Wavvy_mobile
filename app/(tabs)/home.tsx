@@ -37,20 +37,20 @@ export default function Home() {
   ];
 
   const popular = [
-    { title: 'Cheques', artist: 'Shubh', id: '2282321217', image: require('../../assets/images/supreme.png') },
+    { title: 'Cheques', artist: 'Shubh', id: '2282321217', image: require('../../assets/images/cheques.png') },
+    { title: 'Jine Saah', artist: 'Ninja', id: '370172031', image: require('../../assets/images/jine_saah.png') },
     { title: 'August', artist: 'Taylor Swift', id: '1053765282', image: require('../../assets/images/august.png') },
-    { title: 'Sada Aura', artist: 'Dulla', id: '3461561831', image: require('../../assets/images/water.png') },
-    { title: 'Khairiyat', artist: 'Arijit Singh', id: '3174180021', image: require('../../assets/images/levitating.png') },
-    { title: 'Jine Saah', artist: 'Dulla', id: '370172031', image: require('../../assets/images/water.png') },
-    { title: 'Jatta', artist: 'Arijit Singh', id: '1594140971', image: require('../../assets/images/levitating.png') },
+    { title: 'Jatta', artist: 'Arijit Singh', id: '1594140971', image: require('../../assets/images/jatta_.png') },
+    { title: 'Sada Aura', artist: 'Dulla', id: '3461561831', image: require('../../assets/images/sada_aura.png') },
+    { title: 'Khairiyat', artist: 'Arijit Singh', id: '3174180021', image: require('../../assets/images/khairiyat.png') },
   ];
 
   const recent = [
-    { title: 'Bandook', artist: 'Nirvair Pannu', id: '972650742', image: require('../../assets/images/hasse.png') },
+    { title: 'Bandook', artist: 'Nirvair Pannu', id: '972650742', image: require('../../assets/images/bandook.png') },
     { title: 'Attraction', artist: 'Sukha, ProdGK', id: '2361725765', image: require('../../assets/images/attraction.png') },
-    { title: 'Barfest', artist: 'Nirvair Pannu', id: '2705113272', image: require('../../assets/images/hasse.png') },
-    { title: 'Pasand Jatt Di', artist: 'Nirvair Pannu', id: '3270662611', image: require('../../assets/images/attraction.png') },
-    { title: 'Neal', artist: 'Sidhu Moosewala', id: '3408975791', image: require('../../assets/images/attraction.png') },
+    { title: 'Barfest', artist: 'Nirvair Pannu', id: '2705113272', image: require('../../assets/images/barfest.png') },
+    { title: 'Pasand Jatt Di', artist: 'Nirvair Pannu', id: '3270662611', image: require('../../assets/images/pasand_jatt_di.png') },
+    { title: 'Neal', artist: 'Sidhu Moosewala', id: '3408975791', image: require('../../assets/images/neal_.png') },
   ];  
 
   useEffect(() => {
@@ -116,11 +116,11 @@ export default function Home() {
 
         </TouchableOpacity>
 
-        <View style={styles.jumpRow}>
           {/* Song Tile */}
+            <View style={styles.jumpRow}> 
           <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/117708444')}>
             <Image
-              source={require('../../assets/images/eminem.png')}
+              source={require('../../assets/images/unstoppable_.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
@@ -128,11 +128,12 @@ export default function Home() {
               <Text style={styles.jumpTileSubText}>Sia</Text>
             </View>
           </TouchableOpacity>
+          
 
-          {/* Playlist Tile */}
+          {/* Song Tile */}
           <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/3422339821')}>
             <Image
-              source={require('../../assets/images/alpha.png')}
+              source={require('../../assets/images/postivity_.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
@@ -146,7 +147,7 @@ export default function Home() {
           {/* Song Tile */}
           <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/1505527562')}>
             <Image
-              source={require('../../assets/images/eminem.png')}
+              source={require('../../assets/images/jaan_.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
@@ -155,10 +156,10 @@ export default function Home() {
             </View>
           </TouchableOpacity>
 
-          {/* Playlist Tile */}
+          {/* Song Tile */}
           <TouchableOpacity style={styles.jumpTileHorizontal} onPress={() => router.push('/player/3140442331')}>
             <Image
-              source={require('../../assets/images/alpha.png')}
+              source={require('../../assets/images/majhail_.png')}
               style={styles.jumpTileImageSmall}
             />
             <View>
