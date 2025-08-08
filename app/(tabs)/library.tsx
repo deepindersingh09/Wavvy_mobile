@@ -1,6 +1,6 @@
-import React, { useContext, useEffect, useState } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   Modal,
@@ -13,22 +13,22 @@ import {
   View,
 } from 'react-native';
 import { supabase } from '../../lib/supabase';
-import { ThemeContext } from '../../lib/ThemeContext';  // import context
-
+import { ThemeContext } from '../../lib/ThemeContext'; // import context
+ 
 export default function Library() {
   const router = useRouter();
   const { darkMode } = useContext(ThemeContext);  // get darkMode from context
-
+ 
   const categories = ['Playlists', 'Albums', 'Artists'];
   const [activeCategory, setActiveCategory] = useState('Playlists');
-
+ 
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState('');
-  const [sort, setSort] = useState('recent'); // Or 'name'
+  const [sort, setSort] = useState('recent');
   const [showPinned, setShowPinned] = useState(false);
-
+ 
   const fetchPlaylists = async () => {
     setLoading(true);
     const {
@@ -36,32 +36,32 @@ export default function Library() {
     } = await supabase.auth.getUser();
     if (user) {
       let query = supabase.from('playlists').select('*').eq('created_by', user.id);
-
+ 
       if (sort === 'name') query = query.order('name', { ascending: true });
       else query = query.order('created_at', { ascending: false });
-
+ 
       if (showPinned) query = query.eq('is_pinned', true);
-
+ 
       const { data, error } = await query;
       if (!error) setPlaylists(data || []);
     }
     setLoading(false);
   };
-
+ 
   useEffect(() => {
     fetchPlaylists();
   }, [sort, showPinned, showCreate]);
-
+ 
   const togglePin = async (playlistId, currentPinned) => {
     await supabase.from('playlists').update({ is_pinned: !currentPinned }).eq('id', playlistId);
     await fetchPlaylists();
   };
-
+ 
   const deletePlaylist = async (playlistId) => {
     await supabase.from('playlists').delete().eq('id', playlistId);
     await fetchPlaylists();
   };
-
+ 
   const handleCreatePlaylist = async () => {
     if (!newName.trim()) return;
     const {
@@ -74,10 +74,10 @@ export default function Library() {
       await fetchPlaylists();
     }
   };
-
+ 
   const albums = [];
   const artists = [];
-
+ 
   return (
     <SafeAreaView style={[styles.safeArea, darkMode && styles.darkSafeArea]}>
       <TouchableOpacity onPress={() => router.back()}>
@@ -88,7 +88,7 @@ export default function Library() {
           style={{ marginTop: 45, marginLeft: 15 }}
         />
       </TouchableOpacity>
-
+ 
       <ScrollView style={[styles.container, darkMode && styles.darkContainer]} showsVerticalScrollIndicator={false}>
         {/* Top Bar */}
         <View style={styles.topBar}>
@@ -99,7 +99,7 @@ export default function Library() {
             </TouchableOpacity>
           </View>
         </View>
-
+ 
         {/* Pill Categories */}
         <View style={styles.categoryRow}>
           {categories.map((cat) => (
@@ -126,7 +126,7 @@ export default function Library() {
             </TouchableOpacity>
           ))}
         </View>
-
+ 
         {/* Recents Header and Sorting */}
         <View style={styles.recentsHeader}>
           <Text style={[styles.recentsLabel, darkMode && styles.darkRecentsLabel]}>Recents</Text>
@@ -146,7 +146,7 @@ export default function Library() {
             </TouchableOpacity>
           </View>
         </View>
-
+ 
         {/* Library Items */}
         <View>
           {activeCategory === 'Playlists' &&
@@ -182,7 +182,7 @@ export default function Library() {
           {/* You can add Albums/Artists sections here in the future */}
         </View>
       </ScrollView>
-
+ 
       {/* Create Playlist Modal */}
       <Modal visible={showCreate} animationType="slide" transparent>
         <View style={[styles.modalBackdrop, darkMode && styles.darkModalBackdrop]}>
@@ -213,14 +213,14 @@ export default function Library() {
     </SafeAreaView>
   );
 }
-
+ 
 const styles = StyleSheet.create({
   safeArea: { flex: 1, backgroundColor: '#fff' },
   darkSafeArea: { backgroundColor: '#000' },
-
+ 
   container: { flex: 1, backgroundColor: '#fff', padding: 16 },
   darkContainer: { backgroundColor: '#000' },
-
+ 
   topBar: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -228,11 +228,11 @@ const styles = StyleSheet.create({
   },
   title: { fontSize: 22, fontWeight: '700', color: '#1A3164', flex: 1 },
   darkTitle: { color: '#fff' },
-
+ 
   iconRow: { flexDirection: 'row' },
   topIcon: { fontSize: 20, color: '#1A3164' },
   darkTopIcon: { color: '#bbb' },
-
+ 
   categoryRow: {
     flexDirection: 'row',
     marginBottom: 14,
@@ -255,7 +255,7 @@ const styles = StyleSheet.create({
   darkActiveCategory: { backgroundColor: '#3E65B6' },
   activeCategoryText: { color: '#fff', fontWeight: '700' },
   darkActiveCategoryText: { color: '#fff' },
-
+ 
   recentsHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -265,12 +265,12 @@ const styles = StyleSheet.create({
   },
   recentsLabel: { color: '#888', fontWeight: '600', fontSize: 16 },
   darkRecentsLabel: { color: '#bbb' },
-
+ 
   gridIcon: { color: '#888', fontSize: 17, marginRight: 7 },
   darkGridIcon: { color: '#bbb' },
-
+ 
   activeIcon: { color: '#1A3164', fontWeight: 'bold' },
-
+ 
   libraryItemRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     paddingRight: 8,
   },
   darkLibraryItemRow: { backgroundColor: '#111' },
-
+ 
   albumThumb: {
     width: 56,
     height: 56,
@@ -291,14 +291,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     overflow: 'hidden',
   },
-
+ 
   libraryInfo: { flex: 1 },
   libraryTitle: { fontSize: 16, fontWeight: '700', color: '#1A3164' },
   darkLibraryTitle: { color: '#fff' },
-
+ 
   librarySubtitle: { color: '#888', fontWeight: '500', fontSize: 13 },
   darkLibrarySubtitle: { color: '#bbb' },
-
+ 
   // Modal
   modalBackdrop: {
     flex: 1,
@@ -307,7 +307,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   darkModalBackdrop: { backgroundColor: 'rgba(255,255,255,0.1)' },
-
+ 
   modalCard: {
     backgroundColor: '#fff',
     borderRadius: 18,
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   darkModalCard: { backgroundColor: '#222' },
-
+ 
   modalTitle: {
     fontSize: 18,
     fontWeight: '700',
@@ -324,7 +324,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   darkModalTitle: { color: '#fff' },
-
+ 
   modalInput: {
     backgroundColor: '#EDF0F7',
     borderRadius: 10,
@@ -339,7 +339,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#333',
     color: '#ccc',
   },
-
+ 
   modalBtn: {
     flex: 1,
     backgroundColor: '#1A3164',
