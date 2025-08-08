@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.15,
     shadowRadius: 6,
     elevation: 10,
-    marginTop:40,
+    marginTop:60,
   },
   tabButton: {
     flex: 1,

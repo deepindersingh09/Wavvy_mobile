@@ -31,9 +31,6 @@ export default function Home() {
 
   const { darkMode } = useContext(ThemeContext);
   const styles = themedStyles(darkMode);
-
-  const filters = ['All', 'English', 'Punjabi', 'Hindi'];
-
   // Added 'query' key for search term
   const recommended = [
     { title: 'Punjabi Hits', image: require('../../assets/images/punjabi_hits.png'), query: 'Punjabi Hits' },
@@ -173,7 +170,7 @@ export default function Home() {
         <Text style={styles.greeting}>{getGreeting()}, {userName || 'First name'} 👋</Text>
 
         {/* Filters */}
-        <View style={styles.filters}>
+        {/* <View style={styles.filters}>
           {filters.map((filter, index) => (
             <TouchableOpacity
               key={filter}
@@ -192,10 +189,10 @@ export default function Home() {
               </Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </View> */}
 
         {/* Jump Back In */}
-        <Text style={styles.sectionTitle}>Jump back in</Text>
+        {/* <Text style={styles.sectionTitle}>Jump back in</Text>
 
         {loadingRecent ? (
           <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>Loading...</Text>
@@ -205,7 +202,6 @@ export default function Home() {
           </Text>
         ) : (
           <>
-            {/* First song - Large card */}
             {recentSongs[0] && (
               <TouchableOpacity
                 key={`large-${recentSongs[0].id}`}
@@ -223,7 +219,6 @@ export default function Home() {
               </TouchableOpacity>
             )}
 
-            {/* Next 4 songs - grid (2 per row) */}
             <View style={styles.jumpGrid}>
               {recentSongs.slice(1, 5).map((song, index) => (
                 <TouchableOpacity
@@ -245,7 +240,6 @@ export default function Home() {
           </>
         )}
 
-        {/* Trending Near You */}
         <Text style={styles.sectionTitle}>Trending Near You</Text>
 
         <ScrollView
@@ -263,7 +257,67 @@ export default function Home() {
               <Text style={styles.trendingText}>{item.title}</Text>
             </TouchableOpacity>
           ))}
-        </ScrollView>
+        </ScrollView> */}
+
+        {/* Jump Back In */}
+        <Text style={[styles.sectionTitle, { color: darkMode ? '#fff' : '#1A3164' }]}>
+          Jump back in
+        </Text>
+
+        {loadingRecent ? (
+          <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>Loading...</Text>
+        ) : recentSongs.length === 0 ? (
+          <Text style={{ color: darkMode ? '#fff' : '#1A3164', marginBottom: 12 }}>
+            No recent songs played yet.
+          </Text>
+        ) : (
+          <>
+            {recentSongs[0] && (
+              <TouchableOpacity
+                key={`large-${recentSongs[0].id}`}
+                style={styles.jumpCardLarge}
+                onPress={() => router.push(`/player/${recentSongs[0].id}`)}
+              >
+                <Image
+                  source={{ uri: recentSongs[0].album.cover_medium }}
+                  style={styles.jumpImageLarge}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.jumpSongLarge, { color: darkMode ? '#fff' : '#1A3164' }]}>
+                    {recentSongs[0].title}
+                  </Text>
+                  <Text style={[styles.jumpArtistLarge, { color: darkMode ? '#bbb' : '#666' }]}>
+                    {recentSongs[0].artist.name}
+                  </Text>
+                </View>
+              </TouchableOpacity>
+            )}
+
+            <View style={styles.jumpGrid}>
+              {recentSongs.slice(1, 5).map((song, index) => (
+                <TouchableOpacity
+                  key={`small-${index}-${song.id}`}
+                  style={styles.jumpCardSmall}
+                  onPress={() => router.push(`/player/${song.id}`)}
+                >
+                  <Image
+                    source={{ uri: song.album.cover_medium }}
+                    style={styles.jumpImageSmall}
+                  />
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.jumpSongSmall, { color: darkMode ? '#fff' : '#1A3164' }]}>
+                      {song.title}
+                    </Text>
+                    <Text style={[styles.jumpArtistSmall, { color: darkMode ? '#bbb' : '#666' }]}>
+                      {song.artist.name}
+                    </Text>
+                  </View>
+                </TouchableOpacity>
+              ))}
+            </View>
+          </>
+        )}
+
 
         {/* Popular Songs */}
         <Text style={styles.sectionTitle}>Popular Songs</Text>
@@ -305,7 +359,7 @@ export default function Home() {
 
 const themedStyles = (darkMode: boolean) =>
   StyleSheet.create({
-    safeArea: {
+     safeArea: {
       flex: 1,
       backgroundColor: darkMode ? '#121212' : '#fff',
     },
@@ -318,70 +372,56 @@ const themedStyles = (darkMode: boolean) =>
       color: darkMode ? '#fff' : '#1A3164',
       marginBottom: 10,
     },
-    filters: {
-      flexDirection: 'row',
-      gap: 10,
-      marginBottom: 10,
-    },
-    filterBtn: {
-      paddingHorizontal: 14,
-      paddingVertical: 6,
-      backgroundColor: darkMode ? '#333' : '#EDF0F7',
-      borderRadius: 20,
-    },
-    filterText: {
-      color: darkMode ? '#ddd' : '#1A3164',
-      fontSize: 14,
-      fontWeight: '500',
-    },
-    activeFilter: {
-      backgroundColor: '#1A3164',
-    },
-    activeFilterText: {
-      color: '#fff',
-    },
     sectionTitle: {
-      color: darkMode ? '#fff' : '#1A3164',
       fontSize: 16,
       fontWeight: '700',
+      color: darkMode ? '#fff' : '#1A3164',
       marginTop: 2,
       marginBottom: 8,
+    },
+    loadingText: {
+      color: darkMode ? '#fff' : '#1A3164',
+      marginBottom: 12,
+    },
+    noRecentText: {
+      color: darkMode ? '#fff' : '#1A3164',
+      marginBottom: 12,
     },
     jumpCardLarge: {
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#EDF0F7',
+      backgroundColor: darkMode ? '#222' : '#EDF0F7',
       borderRadius: 12,
-      gap: 4,
+      gap: 8,
       marginBottom: 12,
-      padding: 5,
+      padding: 10,
     },
     jumpImageLarge: {
       width: 52,
       height: 55,
       borderRadius: 8,
-      marginRight: 5,
+      marginRight: 8,
     },
     jumpSongLarge: {
-      color: '#1A3164',
+      color: darkMode ? '#fff' : '#1A3164',
       fontSize: 14,
       fontWeight: '700',
     },
     jumpArtistLarge: {
-      color: '#1A3164',
+      color: darkMode ? '#bbb' : '#666',
       fontSize: 12,
     },
     jumpGrid: {
       flexDirection: 'row',
       flexWrap: 'wrap',
       justifyContent: 'space-between',
-      gap: 1,
+      gap: 8,
     },
     jumpCardSmall: {
       width: (width - 48) / 2,
       flexDirection: 'row',
       alignItems: 'center',
-      backgroundColor: '#EDF0F7',
+      backgroundColor: darkMode ? '#222' : '#EDF0F7',
       borderRadius: 12,
       padding: 8,
       marginBottom: 8,
@@ -393,38 +433,12 @@ const themedStyles = (darkMode: boolean) =>
       marginRight: 8,
     },
     jumpSongSmall: {
-      color: '#1A3164',
+      color: darkMode ? '#fff' : '#1A3164',
       fontSize: 14,
       fontWeight: '600',
     },
     jumpArtistSmall: {
-      color: '#1A3164',
-      fontSize: 12,
-    },
-
-    trendingRow: {
-      flexDirection: 'row',
-      gap: 15,
-      marginBottom: 16,
-    },
-    trendingCard: {
-      backgroundColor: darkMode ? '#222' : '#fff',
-      borderRadius: 12,
-      elevation: 2,
-      alignItems: 'center',
-      width: width * 0.28,
-    },
-    trendingImage: {
-      width: '100%',
-      height: 120,
-      borderTopLeftRadius: 12,
-      borderTopRightRadius: 12,
-    },
-    trendingText: {
-      padding: 6,
-      fontWeight: '700',
-      color: darkMode ? '#fff' : '#1A3164',
-      textAlign: 'center',
+      color: darkMode ? '#bbb' : '#666',
       fontSize: 12,
     },
     popularRow: {
@@ -432,8 +446,7 @@ const themedStyles = (darkMode: boolean) =>
     },
     popularItem: {
       alignItems: 'center',
-      marginRight: 8,
-      marginLeft: 8,
+      marginHorizontal: 8,
     },
     popularImage: {
       width: 80,
@@ -460,6 +473,7 @@ const themedStyles = (darkMode: boolean) =>
       backgroundColor: darkMode ? '#333' : '#EDF0F7',
       borderRadius: 8,
       marginBottom: 10,
+      padding: 8,
     },
     recentImage: {
       width: 60,

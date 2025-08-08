@@ -1,5 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useEffect, useState } from 'react';
 
 type ThemeContextType = {
   darkMode: boolean;
@@ -38,7 +38,7 @@ export const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  if (!isReady) return null; // prevent flicker
+  if (!isReady) return null; 
 
   return (
     <ThemeContext.Provider value={{ darkMode, setDarkMode }}>
